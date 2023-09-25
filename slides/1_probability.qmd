@@ -974,7 +974,83 @@ With the graphical representation, think about *taking a slice of the PMF and re
 #| output: false
 ```
 
+
+
+
+
+```{r}
+#| warning: false
+#| message: false
+
+library(tidyverse)
+library(rgl)
+setupKnitr(autoprint = TRUE)
+```
+
+## Jointly continuous random variables
+
+<!-- plan: get some code to make the RGL surface for a distribution for which I can compute the marginal and conditional -->
+
+Joint *probability density function* (PDF): 
+
+```{r mvrnorm, webgl = T}
+#| message: false
+#| output: false
+
+dat <- expand_grid(x = seq(-3, 3, length = 100),
+                   y = seq(-3, 3, length = 100))
+
+dat |> 
+  mutate(z = mvtnorm::dmvnorm(as.matrix(dat))) -> datt
+         
+open3d()
+
+plot3d(datt, col = "lightblue", alpha = .5, 
+       xlab = "x", ylab = "y", zlab = "f(x, y)", 
+       xlim = c(-3, 3), ylim = c(-3, 3),
+       aspect = c(1, 1, .5))
+
+rgl.close()
+```
+
+Think about marginal PDF, conditional PDF.
+
+## Jointly continuous random variables (2)
+
+Another joint PDF: 
+
+```{r mvrridge, webgl = T}
+#| message: false
+#| output: false
+
+dat |> 
+  mutate(z = mvtnorm::dmvnorm(as.matrix(dat), sigma = cbind(c(1, .7), c(.7, 1)))) -> datt2
+         
+open3d()
+
+plot3d(datt2, col = "lightblue", alpha = .5, 
+       xlab = "x", ylab = "y", zlab = "f(x, y)", 
+       xlim = c(-3, 3), ylim = c(-3, 3),
+       aspect = c(1, 1, .5))
+
+rgl.close()
+```
+
+Think about marginal PDF, conditional PDF.
+
 ## Independence of random variables
+
+Random variables $X$ and $Y$ are independent if, $\forall x, y \in \mathbb{R}$:
+
+$$f(x, y) = f_X(x) f_Y(y)$$
+
+. . . 
+
+Equivalently, 
+
+$X$ and $Y$ are independent if the conditional distribution of $X$ at every $y$ is the same as the marginal distribution of $X$, i.e. if $f_{X | Y}(x | y) = f_X(x)$ $\forall x \in \mathbb{R}$ and $\forall y \in \text{Supp}[Y]$
+
+And vice versa. 
 
 
 
