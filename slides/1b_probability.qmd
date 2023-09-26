@@ -1,6 +1,6 @@
 ---
 title: "PLSC30500, Fall 2023"
-subtitle: "Part 1. Probability (part b)"
+subtitle: "Part 1. Probability Theory (part b)"
 author: "Andy Eggers"
 format: 
   revealjs:

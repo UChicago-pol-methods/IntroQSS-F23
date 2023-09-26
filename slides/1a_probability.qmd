@@ -1,6 +1,6 @@
 ---
 title: "PLSC30500, Fall 2023"
-subtitle: "Part 1. Probability (part a)"
+subtitle: "Part 1. Probability Theory (part a)"
 author: "Andy Eggers"
 format: 
   revealjs:
@@ -55,7 +55,7 @@ The urn problems help us compare differences we see between treatment and contro
 
 Even when there was no random selection (e.g. data on all countries) we can *act as if there was*, or act as if the dependent variable (e.g. revolution) has a random component. 
 
-Then the urn problems again help us compare the "sample" to the "population", or observed reality to what might have happened in an alternate history.
+Then the urn problems again help us compare the "sample" to the "population", or observed reality to what might have happened in an alternate history *if we treat our ignorance as chance*.
 
 
 ## Probability vs statistical inference {.smaller}
@@ -160,6 +160,10 @@ How about for a single roll of two six-sided die?
 $$\Omega = \{(x, y) \in \mathbb{Z}^2 : 1 \leq x \leq 6, 1 \leq y \leq 6 \}$$
 ("Set-builder notation", used w/o explanation at A&M p. 5)
  
+Easier examples: 
+
+- $\{x \in \mathbb{R} : x > 0\}$
+- $\{x \in \mathbb{Z} : 2 \leq x \leq 5 \}$
  
 :::{.notes}
 All states of the world that can result from the process.
@@ -184,7 +188,7 @@ expand_grid(x = 1:6, y = 1:6) |>
   theme_bw()
 ```
 
-## Event space {.smaller}
+## Events and event spaces {.smaller}
 
 An **event** is a collection of outcomes to which we want to assign a probability. (A subset of the sample space.)
 
@@ -216,7 +220,7 @@ A **probability measure**  is a function $P : S \rightarrow \mathbb{R}$ that ass
 
 - Non-negativity: $\forall A \in S$, $P(A) \geq 0$  [(probabilities are positive)]{.dark-gray}
 - Unitarity: $P(\Omega) = 1$ [(probability that something happens is 1)]{.dark-gray}  
-- Countable additivity: if $A_1, A_2, A_3, \ldots \in S$ are pairwise disjoint, then 
+- Countable additivity: if $A_1, A_2, A_3, \ldots \in S$ are **pairwise disjoint**, then 
 
 $$P(A_1 \cup A_2 \cup A_3 \cup \ldots ) = P(A_1) + P(A_2) + P(A_3) + \ldots = \sum_i P(A_i) $$
 [(for events that cannot co-occur, the probability of one of the event occurring is the sum of the individual probs)]{.dark-gray}
@@ -399,8 +403,6 @@ $$P(B) = \sum_i P(B\cap A_i) = \sum_i P(B \mid A_i) P(A_i)$$
 
 **Definition**: Events $A, B \in S$ are **independent** if $P(A \cap B) = P(A)P(B)$
 
-. . .
-
 ```{tikz ind}
 #| fig-width: 6 
 #| fig-align: center
@@ -430,7 +432,6 @@ $$P(B) = \sum_i P(B\cap A_i) = \sum_i P(B \mid A_i) P(A_i)$$
 
 
 . . . 
-
 
 Informally, knowing $A$ occurs does not tell you anything about whether $B$ occurs.
 
