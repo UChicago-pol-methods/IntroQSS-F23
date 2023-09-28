@@ -226,29 +226,41 @@ $$P(A_1 \cup A_2 \cup A_3 \cup \ldots ) = P(A_1) + P(A_2) + P(A_3) + \ldots = \s
 [(for events that cannot co-occur, the probability of one of the event occurring is the sum of the individual probs)]{.dark-gray}
 
 
-## Kolmogorov axioms (2) {.smaller}
+## Basic properties of probability
 
-Recall the axioms: 
+Let $(\Omega, S, P)$ be a probability space. Then 
 
-- Non-negativity: $\forall A \in S$, $P(A) \geq 0$  [(probabilities are positive)]{.dark-gray}
-- Unitarity: $P(\Omega) = 1$ [(probability that something happens is 1)]{.dark-gray}  
-- Countable additivity: if $A_1, A_2, A_3, \ldots \in S$ are pairwise disjoint, then 
+- Monotonicity: $\forall A, B \in S$, if $A \subseteq B$, then $P(A) \leq P(B)$
+- Subtraction rule: $\forall A, B \in S$, if $A \subseteq B$, then $P(B \setminus A) = P(B) - P(A)$
+- Zero probability of the empty set: $P(\emptyset) = 0$
+- Probability bounds: $\forall A \in S$, $0 \leq P(A) \leq 1$
+- Complement rule: $\forall A \in S$, $P(A^C) = 1 - P(A)$
 
-$$P(A_1 \cup A_2 \cup A_3 \cup \ldots ) = P(A_1) + P(A_2) + P(A_3) + \ldots = \sum_i P(A_i) $$
+. . . 
 
-. . .
+Let's prove it! (on board, also see A&M page 8, or slide notes by pressing `s`)
 
-Explain why, if $(\Omega, S, P)$ is a probability space
+:::{.notes}
+If $A \subseteq B$, then $B = A \cup (B \setminus A)$.
 
-- $\forall A \in S$, $0 \leq P(A) \leq 1$
-- $\forall A \in S$, $P(A^C) = 1 - P(A)$
+Countable additivity implies $P(B) = P(A) + P(B \setminus A)$
 
-(See Theorem 1.1.4.)
+So $P(A) \leq P(B)$ (**monotonicity**).
+
+$P(B \setminus A) = P(B) - P(A)$ (**subtraction rule**).
+
+$P(\emptyset) = P(A \setminus A) = P(A) - P(A)$ (by subtraction rule) $ = 0$ (**zero prob of empty set**)
+
+$A \subseteq \Omega$ (by definition). $P(A) \geq 0$ (by non-negativity, one of the axioms), and $P(\Omega = 1)$ (by unitarity, one of the axioms) (**probability bounds**)
+
+$\Omega = A \cup (\Omega \setminus A) = A \cup A^C$ (by definition of $A^C$). $P(\Omega) = P(A) + P(A^C)$ (by countable additivity). $P(\Omega) = 1$ (by unitarity, one of the axioms), so $P(A^C) = 1 -  P(A)$.
+
+:::
 
 
 ## An aside on what we're doing
 
-The goal is a strong system of understanding where every statement follows from 
+Goal: a strong *system of understanding*; every statement follows from 
 
 - definitions [(what we mean by $X$)]{.gray}
 - axioms [(assertions taken to be self-evident requirements)]{.gray}
@@ -257,14 +269,43 @@ The goal is a strong system of understanding where every statement follows from
 
 . . . 
 
-Every statement is supported, no unnecessary assumptions/definitions.
+Every statement supported, no unnecessary assumptions.
+
+There are "rules" (e.g. addition rule) and "laws" (e.g. law of total probability) but no one made them (directly).  
 
 
-## Joint probability and the addition rule  {.smaller}
+## Joint probability and the addition rule  
 
 **Def 1.1.5**: For $A, B \in S$, the **joint probability** of $A$ and $B$ is the probability that both $A$ and $B$ happen, i.e. $P(A \cap B)$
 
 . . . 
+
+**Addition rule**: For $A, B \in S$, 
+
+$$ P(A \cup B) = P(A) + P(B) - P(A \cap B)$$
+Let's prove it! (Board, or book or `S`)
+
+:::{.notes}
+$A \cup B = (A \setminus (A \cap B)) \cup (B \setminus (A \cap B)) \cup (A \cap B)$
+
+By countable additivity, 
+
+$P(A \cup B) = P(A \setminus (A \cap B)) + P(B \setminus (A \cap B)) + P(A \cap B)$
+
+By subtraction rule, 
+
+$P(A \cup B) = P(A) - P(A \cap B) + P(B) - P(A \cap B) + P(A \cap B)$
+
+Rearranging, $P(A \cup B) = P(A) + P(B) - P(A \cap B)$. 
+
+:::
+
+
+## Addition rule, visually {.smaller}
+
+
+$$ P(A \cup B) = P(A) + P(B) - P(A \cap B)$$
+
 
 ```{tikz venn}
 #| fig-width: 5 
@@ -285,22 +326,12 @@ Every statement is supported, no unnecessary assumptions/definitions.
 ```
 
 
-. . . 
-
-**Addition rule**: For $A, B \in S$, 
-
-$$ P(A \cup B) = P(A) + P(B) - P(A \cap B)$$
-
-## Assumptions behind our use of Venn diagram 
-
-```{tikz venn}
-#| fig-width: 6 
-#| fig-align: center
-```
+Assumptions behind this use of Venn diagram: 
 
 - think of each pixel in the rectangle as an outcome $\omega$ in the sample space $\Omega$
 - each outcome has equal probability
 - $A$ and $B$ are events (sets of outcomes)
+
 
 
 ## Conditional probability 
@@ -438,21 +469,25 @@ Informally, knowing $A$ occurs does not tell you anything about whether $B$ occu
 
 ## Independence and conditional probability 
 
-**Theorem 1.1.16** For $A, B \in S$ with $P(B) > 0$, $A$ and $B$ are independent if and only if $P(A \mid B) = P(A).$ 
+**Theorem 1.1.16** For $A, B \in S$ with $P(B) > 0$, $A$ and $B$ are independent (i.e. $A \perp \!\!\! \perp B$) if and only if $P(A \mid B) = P(A).$ 
 
 . . .
 
 **Proof:**
 
-$A$ and $B$ are independent $\iff P(A \cap B) = P(A)P(B)$  [(definition of independence)]{.gray}
+$A \perp \!\!\! \perp B$ $\iff P(A \cap B) = P(A)P(B)$  [(definition)]{.gray}
 
 . . . 
 
-$A$ and $B$ are independent $\iff P(A \mid B) P(B) = P(A)P(B)$  [(product rule)]{.gray}
+$A \perp \!\!\! \perp B$  $\iff P(A \mid B) P(B) = P(A)P(B)$  [(product rule)]{.gray}
 
 . . . 
 
-$A$ and $B$ are independent $\iff P(A \mid B) = P(A).$  $\,\, \blacksquare$ [(divide both sides by $P(B)$)]{.gray}
+$A \perp \!\!\! \perp B$ $\iff P(A \mid B) = P(A).$  $\,\, \blacksquare$ [(divide by $P(B)$)]{.gray}
+
+. . . 
+
+In subjective terms, knowing $B$ occurred does not affect our assessment of probability that $A$ occurred. 
 
 
 ## Independent? 
@@ -464,5 +499,4 @@ Pick a student at random from the university. Are $A$ and $B$ independent in the
 - $A$ = student is undergraduate, $B$ = student is under 22 years old
 - $A$ = student is studying biology, $B$ = student is breathing
 - $A$ = student is woman, $B$ = student has brown hair
-
 
