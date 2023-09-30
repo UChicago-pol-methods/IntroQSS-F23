@@ -5,7 +5,7 @@ subtitle: "Due October 2, 2023, at 9pm"
 format: pdf
 ---
 
-*\textsc{Note}: Start with the file `ps1_2023_probability.qmd` (available from the github repository at <https://github.com/UChicago-pol-methods/IntroQSS-F23/tree/main/assignments>). Modify that file to include your answers. Make sure you can "knit" the file (e.g. in RStudio by clicking on the `Knit` button). Submit both the qmd file and the knitted PDF via Canvas.* 
+*\textsc{Note}: Start with the file `ps1_2023_probability.qmd` (available from the github repository at <https://github.com/UChicago-pol-methods/IntroQSS-F23/tree/main/assignments>). Modify that file to include your answers. Make sure you can "render" the file (e.g. in RStudio by clicking on the `Render` button). Submit both the qmd file and the knitted PDF via Canvas.* 
 
 ## Problem 1: joint probability, conditional probability, independence
 
