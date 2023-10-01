@@ -18,7 +18,7 @@ format:
 #| message: false
 
 library(tidyverse)
-
+knitr::opts_chunk$set(dev = "ragg_png")
 ```
 
 
@@ -64,7 +64,7 @@ If the events of interest can be quantified, then
 
 - $X$ is a random variable indicating e.g. the number of successes
 
-is much easier to work with than 
+This is much easier to work with than 
 
 - $A$ is the event that there are 0 successes, $B$ that there are 1 successes, \ldots
 
@@ -76,7 +76,7 @@ is much easier to work with than
 Blitzstein and Hwang: "Random variables provide *numerical* summaries of the experiment in question."
 
 
-## Functions/operators of random variables {.smaller}
+## Functions/operators of random variables 
 
 Since a random variable $X$ produces numbers, we can apply **functions**: e.g. $X^2$, $\sqrt{X}$, generically $g(X)$
 
@@ -86,9 +86,9 @@ This gives us a new number for each $\omega$ -- a new random variable.
 
 . . .
 
-We will also want to describe characteristics of random variables using **operators**: e.g. $E[X]$ (**expectation**) and $V[X]$ (**variance**). 
+We also want to describe a random variable using **operators**: e.g. $E[X]$ (**expectation**), $V[X]$ (**variance**). 
 
-This gives us a number to describe $X$ -- **not** a new random variable. [(Though we may estimate these from samples, producing random variables, e.g. **sample mean**, **sample variance**.)]{.gray}
+This gives us a number to describe $X$ -- **not** a new random variable. [(We may *estimate* these from samples, producing RVs, e.g. **sample mean**, **sample variance**.)]{.gray}
 
 
 ## Blitzstein and Hwang figure
@@ -96,13 +96,13 @@ This gives us a number to describe $X$ -- **not** a new random variable. [(Thoug
 ![](assets/blitzstein_hwang_gX_fig.png){width=80% fig-align="center"}
 
 
-## Discrete random variables and the PMF {.smaller}
+## Discrete random variables and the PMF 
 
 A random variable $X$ is **discrete** if its range $X(\Omega)$ is a **countable set**. For example, $\{1,2,3\}$, $\{1,2,3, \ldots\}.$
 
 . . .
 
-A discrete RV can be fully described by a **probability mass function** (PMF): $$f(x) = \text{Pr}[X = x], \forall x \in \mathbb{R}.$$
+A discrete RV has a **probability mass function** (PMF): $$f(x) = \text{Pr}[X = x], \forall x \in \mathbb{R}.$$
 
 . . .
 
@@ -162,7 +162,7 @@ ggplot(plotdata, aes(x = x, y = `f(x)`)) +
   coord_cartesian(xlim = c(-0.5, 2.5),
                   ylim = c(0,1)) +
   geom_segment(aes(x = x, y = c(0,0,0,0), xend = x, yend = `f(x)`)) +
-  labs(main = 'PMF of X (number of heads in 2 fair coin flips)',
+  labs(title = 'PMF of X (number of heads in 2 fair coin flips)',
        x = "x (number of heads)")
 ```
 :::
@@ -187,7 +187,7 @@ ggplot(plotdata, aes(x = x, y = `F(x)`)) +
 ::::
 
 
-## Continuous random variables {.smaller}
+## Continuous random variables 
 
 If a random variable could take on a **continuum** of values [(i.e. $X(\Omega)$ includes some interval of the real line)]{.gray}, then we say it is **continuous**.
 
@@ -205,8 +205,8 @@ norm_plotdata <- tibble(x = seq(-4, 4, by = .01)) |>
 
 :::{.column width="50%"}
 ```{r norm_plotPMF}
-#| fig-width: 5
-#| fig-height: 5
+#| fig-width: 4
+#| fig-height: 4
 #| fig-align: center
 #| echo: false
 ggplot(norm_plotdata, aes(x = x, y = `f(x)`)) +
@@ -218,8 +218,8 @@ ggplot(norm_plotdata, aes(x = x, y = `f(x)`)) +
 
 :::{.column width="50%"}
 ```{r norm_plotCDF}
-#| fig-width: 5
-#| fig-height: 5
+#| fig-width: 4
+#| fig-height: 4
 #| fig-align: center
 #| echo: false
 ggplot(norm_plotdata, aes(x = x, y = `F(x)`)) +
@@ -388,7 +388,7 @@ tibble(x = c(0, 0, 1, 1, 2, 2), y = rep(c(0, 1), 3), `Pr[X = x, Y = y]` = c("1/8
 
 Let $X$ denote number of heads in **two** tosses of a fair coin.
 
-Let $Y$ denote whether a single ball drawn from an urn with equal number of blue and black balls is blue.
+Let $Y$ denote number of heads in **one** toss of a fair coin.
 
 
 $$
