@@ -13,6 +13,8 @@ format:
 
 ---
 
+<!-- this seems too short. Is there something I can add? Marginal PDF in the continuous case. something about multivariate generalizations. I can add this tomorrow. --> 
+
 ```{r}
 #| warning: false
 #| message: false
@@ -57,6 +59,9 @@ Usually we just write $X = 1$ and $\text{Pr}[X = 1]$. [(cf $P(A)$ for events)]{.
 ## Random variables: another Blitzstein and Hwang figure
 
 ![](assets/blitzstein_hwang_fig_2.png){width=80% fig-align="center"}
+
+"Two random variables defined on the same sample space"
+
 
 ## Why though?
 
