@@ -630,7 +630,6 @@ plot3d(datt, col = "lightblue", alpha = .5,
 rgl.close()
 ```
 
-Think about marginal PDF, conditional PDF.
 
 ## Jointly continuous random variables (2)
 
@@ -640,8 +639,9 @@ Another joint PDF:
 #| message: false
 #| output: false
 
+Sigma <- cbind(c(1, .7), c(.7, 1))
 dat |> 
-  mutate(z = mvtnorm::dmvnorm(as.matrix(dat), sigma = cbind(c(1, .7), c(.7, 1)))) -> datt2
+  mutate(z = mvtnorm::dmvnorm(as.matrix(dat), sigma = Sigma)) -> datt2
          
 open3d()
 
@@ -653,7 +653,88 @@ plot3d(datt2, col = "lightblue", alpha = .5,
 rgl.close()
 ```
 
-Think about marginal PDF, conditional PDF.
+
+## Marginal PDF in the continuous case
+
+
+$$f_Y(y) = \int_{-\infty}^{\infty}f(x,y) dx, \forall y \in \mathbb{R}$$
+
+To get $f_Y(y)$ for a specific $y$, slice the joint pdf at $Y = y$, and integrate (sum) $f(x, y)$ across all values of $x$. 
+
+To get $f_Y(y)$ for all $y$s, think about squishing the PDF into the $y$-axis. 
+
+
+
+## Conditional PDF in the continuous case
+
+
+$$f_{Y \mid X}(y \mid x) = \frac{f(x,y)}{f(x)}, \forall y \in \mathbb{R} \, \text{and} \, \forall x \in \mathrm{Supp}[X]$$
+
+```{r}
+#| message: false
+#| output: false
+
+open3d()
+
+plot3d(datt2, col = "lightblue", alpha = .5, 
+       xlab = "x", ylab = "y", zlab = "f(x, y)", 
+       xlim = c(-3, 3), ylim = c(-3, 3),
+       aspect = c(1, 1, .5))
+
+rgl.close()
+```
+
+For a specific $x$, what does $f(x,y)$ look like? What does $f(x)$ look like? 
+
+
+
+
+## Conditional PDF (2) {.smaller}
+
+$f(x, y)$ for $x=1$ is the intersection between the joint pdf and the plane $x = 1$: 
+
+```{r}
+#| message: false
+#| output: false
+
+open3d()
+
+plot3d(datt2, col = "lightblue", alpha = .5, 
+       xlab = "x", ylab = "y", zlab = "f(x, y)", 
+       xlim = c(-3, 3), ylim = c(-3, 3),
+       aspect = c(1, 1, .5))
+planes3d(a = 1, b = 0, c = 0, d = -1, col = "red", alpha = .5)
+
+n <- 100
+y <- seq(-3, 3, length = n)
+x <- rep(1, length(y))
+z <- mvtnorm::dmvnorm(cbind(x, y), sigma = Sigma)
+lines3d(x = x, y = y, z = z, col = "black", lwd = 2)
+
+rgl.close()
+
+# numerically compute integral:
+fx <- sum(z)*(y[2] - y[1])
+
+```
+
+And $f(x)$ is the integral of that intersection: numerically I compute it to be about `r round(fx, 2)`.
+
+## Conditional PDF (3)
+
+```{r}
+tibble(y = y,
+       `f(x, y) at x=2 (joint)` = z,
+       `f(y | x = 2) (conditional)` = z/fx) |> 
+  pivot_longer(-y) |> 
+  ggplot(aes(x = y, y = value, col = name)) + 
+  geom_line() + 
+  labs(y = "", col = "") + 
+  scale_color_manual(values = c("black", "turquoise"))
+
+```
+
+
 
 ## Independence of random variables
 
