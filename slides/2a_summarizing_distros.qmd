@@ -368,6 +368,8 @@ We can compute $(X - E[X])^2$ at each $x$:
 :::
 ::::
 
+. . .
+
 And then $E[(X - E[X])^2]$:
 
 $$\begin{aligned}
@@ -426,11 +428,11 @@ For a random variable $X$,
 Proof of second point: 
 
 $$\begin{align}
-V[X] &= E\left[(X - E[X])^2\right] \\
-&= E\left[X^2 - 2E[X] X + E[X]^2\right] \\
-&= E[X^2] - 2E\left[\color{blue}{E[X]} X\right] + E\left[E[X]^2\right] \\
-&= E[X^2] - 2 \color{blue}{E[X]} E[X] + E[X]^2 \\ 
-&= E[X^2] - E[X]^2
+V[aX] &= E\left[(aX - E[aX])^2\right] \\
+&= E\left[(aX - aE[X])^2\right] \\
+&= E\left[a^2(X - E[X])^2\right] \\
+&= a^2 E\left[(X - E[X])^2\right] \\
+&= a^2 V[X]
 \end{align}$$
 
 ## Standard deviation
