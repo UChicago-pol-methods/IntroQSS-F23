@@ -614,8 +614,8 @@ Joint *probability density function* (PDF):
 #| message: false
 #| output: false
 
-dat <- expand_grid(x = seq(-3, 3, length = 100),
-                   y = seq(-3, 3, length = 100))
+dat <- expand_grid(x = seq(-10, 10, length = 300),
+                   y = seq(-10, 10, length = 300))
 
 dat |> 
   mutate(z = mvtnorm::dmvnorm(as.matrix(dat))) -> datt
@@ -734,7 +734,70 @@ tibble(y = y,
 
 ```
 
+## Conditional PDF (4)
 
+Above is $f_{Y \mid X} (y \mid x)$ for one value of $x$. Here it is for all $x$:
+
+
+```{r}
+#| message: false
+#| output: false
+
+# fix this by using a bigger range for x and y and clipping it.
+datt2 |> 
+  group_by(x) |> 
+  mutate(z = z/sum(z)) |> 
+  ungroup() -> datt2_conditional
+
+open3d()
+
+plot3d(datt2_conditional, col = "lightblue", alpha = .5, 
+       xlab = "x", ylab = "y", zlab = "f(y | x)", 
+       xlim = c(-3, 3), ylim = c(-3, 3),
+       aspect = c(1, 1, .5))
+
+rgl.close()
+
+```
+
+## Conditional PDF (5) {.smaller}
+
+::::{.columns}
+Questions that are best answered with  
+
+:::{.column width="50%"}
+Joint dist. $f(x,y)$:
+
+- how common are tall, smart people?
+- in a particular industry, are there more women CEOs or men CEOs? 
+- what proportion of crimes are committed by young women?
+:::
+
+:::{.column width="50%"}
+
+Conditional dist. $f_{Y|X}(y | x)$:
+
+- how smart are tall people? how tall are smart people?
+- in a particular industry, is the proportion of women who are CEOs higher than the proportion of men who are CEOs?
+- of crimes committed by women, what proportion are committed by young women?
+
+:::
+::::
+
+Can be very important to distinguish between the two!
+
+
+
+## Which conditional probability? {.smaller}
+
+Researchers often get confused about which conditional probability they are handling, $\Pr[Y \mid X]$ or $\Pr[X \mid Y]$. 
+
+- $\Pr[ \text{data} \mid H_0 \textrm{ is true}]$ is (roughly) the p-value; $\Pr[ H_0 \textrm{ is true} \mid \text{data}]$ is something else
+- [Johnson et al (2019)](https://www.pnas.org/doi/10.1073/pnas.1903856116) use data on shootings to measure $$\Pr(\text{minority civilian}  \mid \text{shot, white officer, } X) - \\ \Pr(\text{minority civilian}  \mid \text{shot, minority officer, } X),$$ but (as pointed out by [Knox and Mummolo](https://www.pnas.org/doi/10.1073/pnas.1919418117)) interpret results as if it was  $$\Pr(\text{shot} \mid \text{minority civilian, white officer, } X) - \\ \Pr(\text{shot}  \mid \text{minority civilian, minority officer, } X)$$
+
+. . .
+
+$\Pr[Y \mid X]$ or $\Pr[X \mid Y]$ are connected by Bayes Rule.
 
 ## Independence of random variables
 
