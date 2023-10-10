@@ -24,8 +24,24 @@ knitr::opts_chunk$set(dev = "ragg_png")
 
 
 
-# Summarizing joint distributions
+# Summarizing joint distributions {background-image="assets/joint_distribution.png" background-size="750px" background-repeat="repeat"}
 
+
+## Motivation
+
+Suppose we have two RVs $X$ and $Y$ 
+
+- number of heads in one coin flip and number of green balls drawn from urn in 6 tries
+- age and height of randomly selected student
+- whether randomly selected citizen served in military and support for foreign war
+
+. . .
+
+We know the joint PMF/PDF $f(x, y)$ and joint CDF $F(x, y)$.
+
+. . .
+
+How can we summarize the joint distribution?
 
 
 ## Covariance  {.smaller}
@@ -162,4 +178,291 @@ $$\begin{aligned}
 \end{aligned}$$
 
 
-<!-- Continue here: BLP, CEF from later lecture -->
+## Covariance, correlation, and independence  {.smaller}
+
+The **correlation** of two RVs $X$ and $Y$ with $\sigma[X] > 0$ and $\sigma[Y] > 0$ is 
+
+$$ \rho[X, Y] = \frac{\text{Cov}[X, Y]}{\sigma[X] \sigma[Y]}$$
+
+. . .
+
+A rescaled, **scale-invariant** version of covariance:  $\rho[X, Y] = \rho[aX, bY]$ for $a, b > 0$
+
+. . . 
+
+If $X$ and $Y$ are independent, then 
+
+- zero covariance
+- zero correlation
+- $V[X + Y] = V[X] + V[Y]$
+
+
+## Conditional expectation: definition (2.2.10)
+
+Discrete version: 
+
+$$E [Y | X = x] = \sum_y y f_{Y|X}(y | x)$$ 
+
+i.e. the expectation of $Y$ at some $x$. 
+
+. . .
+
+Continuous version: 
+
+$$E [Y | X = x] = \int_{-\infty}^\infty y f_{Y|X}(y | x) \, dy$$
+
+
+## Conditional expectation: illustration  {.smaller}
+
+Suppose $f_X(x)$ is uniform, and $f_{Y|X}(y|x)$ normal, with mean of $3x + 8x^2 - 3x^3$ and variance of $9$.
+
+Then what is $E [Y | X = 1]$?
+
+
+```{r}
+#| fig-align: center
+n <- 1000
+dat <- tibble(x = runif(n, min = 0, max = 2.75)) |> 
+  mutate(mu = 3*x + 8*x^2 - 3*x^3,
+         y = rnorm(n, mean = mu, sd = 3))
+p <- dat |> 
+  ggplot(aes(x = x, y = y)) + 
+  geom_point(alpha = .5, size = 2) +
+  theme_bw() + 
+  geom_line(aes(y = mu), col = "red", lwd = 2)
+p
+```
+
+
+
+
+## Conditional variance {.smaller}
+
+Two formulations: 
+
+$$V[Y | X = x] = E[(Y - E[Y | X =x])^2 | X = x]$$
+$$V[Y | X = x] = E[Y^2 | X = x] - E[Y | X =x]^2$$
+
+
+```{r}
+#| fig-align: center
+p
+```
+
+
+## Conditional variance (2) {.smaller}
+
+
+Two formulations: 
+
+$$V[Y | X = x] = E[(Y - E[Y | X =x])^2 | X = x]$$
+
+$$V[Y | X = x] = E[Y^2 | X = x] - E[Y | X =x]^2$$
+
+```{r, echo = F}
+#| fig-align: center
+tibble(x = runif(n, min = 0, max = 2.75)) |> 
+  mutate(mu = 3*x + 8*x^2 - 3*x^3,
+         y = rnorm(n, mean = mu, sd = 1 + x)) |> 
+  ggplot(aes(x = x, y = y)) + 
+  geom_point(alpha = .5, size = 2) +
+  theme_bw() + 
+  geom_line(aes(y = mu), col = "red", lwd = 2)
+```
+
+
+
+## Conditional Expectation Function (CEF) {.smaller}
+
+Conditional expectation $E[Y | X = x]$ is for a specific $x$.
+
+Conditional expectation function (CEF) $E[Y | X]$ is for all $x$.
+
+. . . 
+
+Suppose again $f_X(x)$ is uniform, and $f_{Y|X}(y|x)$ normal, with mean of $3x + 8x^2 - 3x^3$ and variance of $9$.
+
+Then what is $E [Y | X ]$?
+
+```{r}
+#| fig-height: 3.5
+p
+```
+
+
+
+
+## CEF as best predictor
+
+The CEF $E[Y | X]$ is the expectation of $Y$ at each $X$.
+
+. . .
+
+We already established that the expectation/mean is the best (in MSE sense) predictor.
+
+. . .
+
+So CEF is the best possible way to use $X$ to predict $Y$.  (See Theorem 2.2.20.)
+
+
+
+
+## Law of iterated expectations
+
+**Theorem 2.2.17**. *Law of iterated expectations*
+
+For random variables $X$ and $Y$,
+
+$$E[Y] = E[E[Y | X]]$$
+
+. . . 
+
+In words: to get the average of $Y$, you can take the average of $Y$ within levels of $X$ and then average those according to the distribution of $X$.
+
+[(Very similar to the law of total probability.)]{.gray}
+
+
+
+## LIE: An intuitive example
+
+A population is 80% female and 20% male.
+
+The average age among females ([$E[Y | X = 1]$]{.gray}) is 25. The average age among males [$E[Y | X = 0]$]{.gray} is 20.
+
+What is the average age in the population [$E[Y]$]{.gray}?
+
+. . .
+
+$$E[E[Y | X]] = .8 \times 25 + .2 \times 20 = 24$$
+
+. . .
+
+See homework for another example.
+
+
+
+## LIE: another example
+
+```{r, echo = F}
+p
+```
+
+
+
+## LIE: another example (2)
+
+```{r, echo = F}
+n <- 5000
+tibble(x = rnorm(n, mean = 3, sd = 1.5)) |> 
+  mutate(mu = 3*x + 8*x^2 - 3*x^3,
+         y = rnorm(n, mean = mu, sd = 3)) |> 
+  filter(x > 0 & x < 2.75) |> 
+  ggplot(aes(x = x, y = y)) + 
+  geom_point(alpha = .5, size = 2) +
+  theme_bw() + 
+  geom_line(aes(y = mu), col = "red", lwd = 2)
+```
+
+
+##  How LIE is used in causal inference (preview) {.smaller}
+
+Suppose we want to measure the average effect of participating in a program (e.g. job training, voter education, military mobilization).
+
+. . . 
+
+Call $\tau_i$ the [(unobservable)]{.gray} treatment effect for unit $i$. We want the **average treatment effect** (ATE), $E[\tau_i]$.
+
+. . . 
+
+Suppose comparing all participants to all non-participants produces a **biased** estimate, but we can get a good estimate of the effect in each subgroup defined by participant background $(X)$.
+
+. . . 
+
+Then we can combine subgroup estimates because (by LIE) $E[\tau_i] = E[E[Y \mid X]]$. 
+
+
+
+
+
+## Law of total variance
+
+$$V[Y] = E[V[Y|X]] + V[E[Y|X]]$$
+
+. . . 
+
+```{r, echo = F}
+p
+```
+
+<!-- 
+## Law of total variance (2)
+
+This will be approximately true of a sample (esp. when we know the CEF):
+
+```{r}
+head(dat, 4)
+```
+
+```{r}
+dat |> 
+  summarize(var(y), var(y - mu), var(mu))
+```
+
+Sample variance of $Y$ equals (approx) sample variance of errors plus sample variance of CEF.
+--> 
+
+
+
+
+## Best linear predictor (BLP) {.smaller}
+
+
+Suppose we want to predict $Y$ using $X$, and we focus on a linear predictor, i.e. a function of the form $\alpha + \beta X$.
+
+. . . 
+
+The best (minimum MSE) predictor satisfies
+
+$$(\alpha, \beta) = \underset{(a,b) \in \mathbb{R}^2}{\arg\min} \, \mathrm{E}\,[\left(Y - (a + bX)\right)^2]$$
+
+. . . 
+
+The solution (see Theorem 2.2.21) is 
+
+- $\beta = \frac{\textrm{Cov}[X, Y]}{\textrm{V}[X]}$
+- $\alpha = \textrm{E}[Y] - \beta \textrm{E}[X]$ 
+
+. . . 
+
+So we could obtain the BLP from a joint PMF. (See homework.)
+
+
+
+## BLP predicts CEF {.smaller}
+
+::::{.columns}
+
+:::{.column column-width="50%"}
+Above, we were looking for best linear predictor (BLP) of $Y$ as function of $X$: 
+
+$$(\alpha, \beta) = \underset{(a,b) \in \mathbb{R}^2}{\arg\min} \, \mathrm{E}\,[\left(Y - (a + bX)\right)^2]$$
+
+:::
+
+
+:::{.column column-width="50%"}
+
+Same answer if you look for the best linear predictor of the CEF $E[Y | X]$:
+
+$$(\alpha, \beta) = \underset{(a,b) \in \mathbb{R}^2}{\arg\min} \, \mathrm{E}\,[\left(\mathrm{E}[Y|X] - (a + bX)\right)^2]$$
+
+
+:::
+::::
+
+
+```{r, echo = F, fig.height = 3.5}
+p + 
+  geom_smooth(method = lm)
+```
+

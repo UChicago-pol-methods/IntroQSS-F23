@@ -15,10 +15,10 @@ Suppose a speech is chosen at random from a collection of politicians' speeches.
 
 | Result  | Probability |
 |------|------------|
-|  $A \cap B$   |       |
-|  $A^C \cap B$   |      |
-|  $A \cap B^C$   |      |
-|  $A^C \cap B^C$   |     |
+|  $A \cap B$   |   $P(A)P(B)$    |
+|  $A^C \cap B$   | $(1 - P(A))P(B)$     |
+|  $A \cap B^C$   |  $P(A)(1 - P(B))$     |
+|  $A^C \cap B^C$   | $(1 - P(A))(1 - P(B))$ |
 
 
 (1b) Do you think events $A$ and $B$ really would be independent, given a collection of speeches from e.g. the US Congress or the British House of Commons? Say why or why not, perhaps with reference to the definition of independence.

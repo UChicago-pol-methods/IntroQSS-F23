@@ -25,6 +25,22 @@ knitr::opts_chunk$set(dev = "ragg_png")
 # Expectations {background-image="assets/hbc_great_expectations.png" background-size="450px" background-repeat="repeat"}
 
 
+## Motivation
+
+Suppose we have a random variable $X$, e.g.
+
+- number of heads in 3 coin flips, 
+- whether randomly selected voter plans to vote for Brexit
+- income of randomly selected citizen
+
+. . . 
+
+We know the PMF/PDF $f(x)$ and CDF $F(x)$.
+
+. . . 
+
+How can we summarize this distribution? 
+
 
 ## Expected value: discrete case 
 
@@ -82,7 +98,7 @@ E[X] &=  0 \times .2 + 1 \times .5 + 3 \times .3 \\
 
 ## Same PMF
 
-```{r, echo = F}
+```{r expectationcase}
 dat <- tibble(x = c(0, 0, 1, 1, 3, 3), y = c(0, .2, 0, .5, 0, .3), item = c(1, 1, 2, 2, 3, 3), type = rep(c("bottom", "top"), 3)) 
 
 dat|> 
@@ -90,51 +106,26 @@ dat|>
   geom_line() + 
   geom_point(data = filter(dat, type == "top")) + 
   expand_limits(y = .65) +
-  geom_vline(xintercept = .5*1 + .3*3, lty = 2)
+  geom_vline(xintercept = .5*1 + .3*3, lty = 2) + 
+  geom_text(x = .5*1 + .3*3 + .1, y = .6, label = "E[X]") + 
+  labs(x = "x", y = "f(x)")
 ```
 
-
-## $E[X]$ as X's center of mass  {.smaller}
-
-Suppose we place a weight $f(x)$ at each value $x \in \text{Supp}(X)$ along a weightless rod.
-
-. . .
-
-Where is the **center of mass**, i.e. point where  rod balances?
-
-. . .
-
-It is the point $c$ where $\sum_x (x - c) f(x) = 0$.
-
-. . .
-
-That point is $E[X]$.
-
-. . .
-
-**Proof**:
-
-$$\begin{aligned} \sum_x (x - E[X]) f(x) &= \sum_x \left( x f(x) - E[X] f(x) \right) \\
-&= \sum_x x f(x) -  \sum_x E[X] f(x) \\
- &= E[X] - E[X] \sum_x f(x) \\
- &= E[X] - E[X] \\
- &= 0
-\end{aligned}$$
 
 
 ## Expectation vs average {.smaller}
 
-Given a set of numbers $x_1, x_2, \ldots, x_n$ we can take the **average**: 
+You know about taking the **average** or **mean** of a set of numbers $x_1, x_2, \ldots, x_n$: 
 
 $$ \overline{x} = \frac{1}{n} \sum_{i = 1}^n x_i $$
 
-What is the connection between $E[X] = \sum_x x f(x)$ and $\overline{x} = \frac{1}{n} \sum_{i = 1}^n x_i$?
+Just as a probability is a long-run frequency, an expectation is a long-run average.  
 
 . . .
 
 - $E[X]$ summarizes a random variable $X$; $\overline{x}$ summarizes a set of numbers
-- if each $x_i$ is an (iid) **sample** from $X$, $\overline{x}$ approximates $E[X]$
-- if each $x$ appears with frequency $f(x)$, then $\overline{x} = E[X]$
+- if each $x_i$ is an (iid) **sample** from $X$, $\overline{x}$ approximates $E[X]$ (more closely with larger samples)
+- if each $x \in \text{Supp}[X]$ appears in the sample with frequency *exactly* $f(x)$, then $\overline{x} = E[X]$
 
 
 
@@ -172,7 +163,7 @@ Why does this work?
 If each unique $x$ appears $n f(x)$ times, then
 
 $$\begin{aligned} \overbrace{\frac{1}{n} \sum_i x_i}^{\text{Average}} &= \frac{1}{n} \sum_x x   n f(x)  \\
-&= \sum_x x  f(x) = E[X] \end{aligned}$$
+&= \frac{n}{n} \sum_x x  f(x) = E[X] \end{aligned}$$
 
 . . .
 
@@ -219,6 +210,7 @@ tibble(x = c(-.5, xs, 2), y = c(0, ys, 0)) |>
 
 <!-- And we will stick to the discrete case as much as possible.--> 
 
+<!--
 ## Expectation of a function of an R.V. (Theorem 2.1.5) {.smaller}
 
 Let $g(X)$ be a function of discrete RV $X$. It is a random variable with PMF $f(g(X))$. 
@@ -229,14 +221,14 @@ Then $$ E[g(X)] = \sum_{x \in \text{Supp}(X)} g(x) f(g(x)) = \sum_{x \in \text{S
 The second equality works because $f(g(x)) = f(x)$. 
 
 For example, if $g(x) = 3X$, then $\Pr[g(X) = 3] = \Pr[X = 1]$.
-
+-->
 <!-- is this worth telling them? yes because of MSE coming up next -->
 <!-- isn't this not quite right -- e.g. if g(X) = x^2, then \Pr[g(X) = 1] = \Pr[X = 1] + \Pr[X = -1]-->
 <!-- some confusion about big X little x -->
 
 ## $E[X]$ as a "good guess" {.smaller}
 
-For R.V. $X$, consider $(X - c)^2$ for some constant $c$. [(An example of $g(x)$.)]{.gray}
+For R.V. $X$, consider $(X - c)^2$ for some constant $c$. [(A function of a random variable.)]{.gray}
 
 . . .
 
@@ -264,6 +256,35 @@ $$
 
 $E[X]$ is the choice of $c$ that minimizes MSE. (Wait for proof.)
 
+
+
+
+## $E[X]$ as X's center of mass (skip?)  {.smaller}
+
+Suppose we place a weight $f(x)$ at each value $x \in \text{Supp}(X)$ along a weightless rod.
+
+. . .
+
+Where is the **center of mass**, i.e. point where  rod balances?
+
+. . .
+
+It is the point $c$ where $\sum_x (x - c) f(x) = 0$.
+
+. . .
+
+That point is $E[X]$.
+
+. . .
+
+**Proof**:
+
+$$\begin{aligned} \sum_x (x - E[X]) f(x) &= \sum_x \left( x f(x) - E[X] f(x) \right) \\
+&= \sum_x x f(x) -  \sum_x E[X] f(x) \\
+ &= E[X] - E[X] \sum_x f(x) \\
+ &= E[X] - E[X] \\
+ &= 0
+\end{aligned}$$
 
 
 
@@ -300,7 +321,7 @@ $$
 ::::
 . . . 
 
-What is $E[XY]$? 
+What is $E[XY]$? [(will need e.g. for covariance)]{.gray}
 
 . . .
 
@@ -314,7 +335,7 @@ E[XY] &\equiv \sum_x \sum_y xy f(x, y) \\
 
 ## Linearity of expectations  {.smaller}
 
-Let $X$ and $Y$ be random variables. Then $\forall a, b, c \in \mathbb{R}$, $E[aX + bY + c] = aE[X] + bE[Y] + c$
+Let $X$ and $Y$ be RVs. Then $\forall a, b, c \in \mathbb{R}$, $E[aX + bY + c] = aE[X] + bE[Y] + c$
 
 . . . 
 
@@ -343,7 +364,7 @@ $$V[X] \equiv E[(X - E[X])^2]$$
 ::::{.columns}
 
 :::{.column width="50%}
-Given this PMF: 
+For Bernoulli RV [($x=1$ means heads, revolution?)]{.gray}: 
 
 $$
 f(x) = \begin{cases}
@@ -370,16 +391,20 @@ We can compute $(X - E[X])^2$ at each $x$:
 
 . . .
 
-And then $E[(X - E[X])^2]$:
+And then variance as $E[(X - E[X])^2]$:
 
 $$\begin{aligned}
 V[X] &= E[(x - E[X])^2] \\ &= p^2(1-p) + (1 - 2p + p^2)p \\ &= p^2 - p^3 + p - 2p^2 + p^3 \\ &= p(1 - p)\end{aligned}$$
 
+## Graphical example
+
+```{r expectationcase}
+```
 
 ## Variance: alternative formulation {.smaller}
 
 
-Same example: 
+Bernoulli example again: 
 
 $$
 f(x) = \begin{cases}
@@ -412,6 +437,7 @@ V[X] &= E\left[(X - E[X])^2\right] \\
 &= E\left[X^2 - 2E[X] X + E[X]^2\right] \\
 &= E[X^2] - 2E\left[\color{blue}{E[X]} X\right] + E\left[E[X]^2\right] \\
 &= E[X^2] - 2 \color{blue}{E[X]} E[X] + E[X]^2 \\ 
+&= E[X^2] - 2 E[X]^2 + E[X]^2 \\ 
 &= E[X^2] - E[X]^2
 \end{align}$$
 
