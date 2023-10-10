@@ -124,7 +124,7 @@ Just as a probability is a long-run frequency, an expectation is a long-run aver
 . . .
 
 - $E[X]$ summarizes a random variable $X$; $\overline{x}$ summarizes a set of numbers
-- if each $x_i$ is an (iid) **sample** from $X$, $\overline{x}$ approximates $E[X]$ (more closely with larger samples)
+- if each $x_i$ is an **independent sample** from $X$, $\overline{x}$ approximates $E[X]$ [(more closely with larger samples)]{.gray}
 - if each $x \in \text{Supp}[X]$ appears in the sample with frequency *exactly* $f(x)$, then $\overline{x} = E[X]$
 
 
@@ -259,7 +259,7 @@ $E[X]$ is the choice of $c$ that minimizes MSE. (Wait for proof.)
 
 
 
-## $E[X]$ as X's center of mass (skip?)  {.smaller}
+## Bonus: $E[X]$ as X's center of mass  {.smaller}
 
 Suppose we place a weight $f(x)$ at each value $x \in \text{Supp}(X)$ along a weightless rod.
 
@@ -290,7 +290,7 @@ $$\begin{aligned} \sum_x (x - E[X]) f(x) &= \sum_x \left( x f(x) - E[X] f(x) \ri
 
 ## Expectation of a function of two RVs {.smaller}
 
-Consider this joint PMF $f(x, y)$ for $X$ and $Y$
+Consider this joint PMF $f(x, y)$ for $X$ and $Y$ [(e.g. state 1 militarizes, state 2 militarizes)]{.gray}
 
 ::::{.columns}
 
