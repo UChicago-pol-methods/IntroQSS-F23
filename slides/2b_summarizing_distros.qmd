@@ -33,7 +33,7 @@ Suppose we have two RVs $X$ and $Y$
 
 - number of heads in one coin flip and number of green balls drawn from urn in 6 tries
 - age and height of randomly selected student
-- whether randomly selected citizen served in military and support for foreign war
+- whether randomly selected citizen served in military and supports a foreign war
 
 . . .
 
@@ -41,7 +41,7 @@ We know the joint PMF/PDF $f(x, y)$ and joint CDF $F(x, y)$.
 
 . . .
 
-How can we summarize the joint distribution?
+How can we summarize the relationship between $X$ and $Y$? 
 
 
 ## Covariance  {.smaller}
@@ -56,9 +56,8 @@ Intuitively, "Does $X$ tend to be above $E[X]$ when $Y$ is above $E[Y]$? (And by
 
 $$
 f(x,y) = \begin{cases}
-1/10 & x = 0, y = 0 \\\
-1/5 & x = 0, y = 1 \\\
-1/5 & x = 1, y = 0 \\\
+1/3 & x = 0, y = 0 \\\
+1/6 & x = 1, y = 0 \\\
 1/2 & x = 1, y = 1 \\\
 0 & \text{otherwise}
 \end{cases}
@@ -71,54 +70,132 @@ What is $E[X]$? What is $E[Y]$?
 Then compute expectation of $(X - E[X])(Y - E[Y])$ (function of two RVs) as above.
 
 
-## Geometric interpretation {.smaller}
 
-For each point $x,y$, construct a cube with width $x - E[X]$, height $y - E[Y],$ and depth $f(x,y)$. Add the "volumes".
+## Geometric representation (1) {.smaller}
 
-::::{.columns}
+Plot the points in $\text{Supp}[X, Y]$ on two axes with point size proportional to $f(x, y)$.
 
-:::{.column width="40%"}
-
-$$
-f(x,y) = \begin{cases}
-1/10 & x = 0, y = 0 \\\
-1/5 & x = 0, y = 1 \\\
-1/5 & x = 1, y = 0 \\\
-1/2 & x = 1, y = 1 \\\
-0 & \text{otherwise}
-\end{cases}
-$$
-
-:::
-
-:::{.column width="60%"}
+Divide the $x, y$ plane into quadrants defined by $x = E[X]$ and $y = E[Y]$. 
 
 ```{r}
-#| fig-height: 6
-ex <- 6/10
-ey <- 6/10
-bind_rows(
-  tibble(x = c(0, 0, ex, ex), y = c(ey, 0, 0, ey), lab = rep("A", 4), f = 1/10),
-  tibble(x = c(0, 0, ex, ex), y = c(ey, 1, 1, ey), lab = rep("B", 4), f = 1/5),
-  tibble(x = c(1, 1, ex, ex), y = c(ey, 0, 0, ey), lab = rep("C", 4), f = 1/5),
-  tibble(x = c(1, 1, ex, ex), y = c(ey, 1, 1, ey), lab = rep("D", 4), f = 1/2)
-  ) -> dat
-
+dat <- tibble(x = c(0, 1, 1), y = c(0, 0, 1), fxy = c(1/3, 1/6, 1/2))
+EX <- dat |> 
+  summarize(sum(x*fxy)) |> 
+  as.numeric()
+EY <- dat |> 
+  summarize(sum(y*fxy)) |> 
+  as.numeric()
+covar <- dat |> 
+  summarize(sum(fxy*(x - EX)*(y - EY)))
 dat |> 
-  ggplot(aes(x = x, y = y, group = lab)) +
-  geom_polygon(aes(fill = f)) + # , col = "black") + 
-  geom_vline(xintercept = ex, lty = 2) + 
-  geom_hline(yintercept = ey, lty = 2) +
-  geom_point(data = tibble(x = c(0, 0, 1, 1), y = c(0, 1, 0, 1), lab = LETTERS[1:4]), size = 3) + 
-  labs(alpha = "f(x, y)") + 
-  coord_fixed() -> gg 
-
-gg
+  ggplot(aes(x = x, y = y)) + 
+  geom_point(aes(size = fxy), show.legend = F) + 
+  geom_vline(xintercept = EX, lty = 2) +
+  geom_hline(yintercept = EY, lty = 2) + 
+  theme_minimal() -> p
+p
 ```
 
-:::
 
-::::
+
+
+## Geometric representation (2) {.smaller}
+
+For each point $(x, y) \in \text{Supp}[X, Y]$, create a rectangle with $(x,y)$ at one corner and $(E[X], E[Y])$ at the opposite corner.
+
+Shade the rectangle green in quadrants I and III (where $(x - E[X])(y - E[X]) > 0$), otherwise red, with intensity proportional to $f(x,y)$.
+
+Covariance (roughly) measures how much green vs red there is.
+
+```{r}
+#| fig-align: center
+make_vertices_from_dat_row <- function(dat_row, label, EX, EY){
+  expand_grid(x = c(dat_row$x, EX),
+              y = c(dat_row$y, EY),
+              label = label,
+              col = ifelse((dat_row$x - EX)*(dat_row$y - EY) > 0, "green", "red"),
+              fxy = dat_row$fxy)[c(1,2,4,3,1),]
+}
+datt <- bind_rows(
+  make_vertices_from_dat_row(dat[1,], "A", EX, EY),
+  make_vertices_from_dat_row(dat[2,], "B", EX, EY),
+  make_vertices_from_dat_row(dat[3,], "C", EX, EY)
+)
+p +
+  geom_polygon(data = datt, aes(fill = col, alpha = fxy), show.legend = F) + 
+  scale_fill_manual(values = c("green", "red")) + 
+  labs(title = str_c("Covariance: ", round(covar, 2)))
+```
+
+
+
+## Geometric representation (3) {.smaller}
+
+<!-- another example -- maybe make a function? --> 
+
+```{r}
+#| fig-align: center
+make_cov_plot <- function(pmf){
+  EX <- pmf |> 
+    summarize(sum(x*fxy)) |> 
+    as.numeric()
+  EY <- pmf |> 
+    summarize(sum(y*fxy)) |> 
+    as.numeric()
+  covar <- pmf |> 
+    summarize(sum(fxy*(x - EX)*(y - EY)))  
+  
+  pmf |> 
+    ggplot(aes(x = x, y = y)) + 
+    geom_point(aes(size = fxy), show.legend = F) + 
+    geom_vline(xintercept = EX, lty = 2) +
+    geom_hline(yintercept = EY, lty = 2) + 
+    theme_minimal() -> p
+  
+  sto <- list()
+  for(i in 1:nrow(pmf)){
+    sto[[i]] <- make_vertices_from_dat_row(pmf[i,], str_c("A", i), EX = EX, EY = EY)
+  }
+  
+  rect_data <- bind_rows(sto)
+  
+  p +
+    geom_polygon(data = rect_data, aes(group = label, fill = col, alpha = fxy), show.legend = F) + 
+    scale_fill_manual(values = c("green", "red")) + 
+    labs(title = str_c("Covariance: ", round(covar, 2)))
+
+}
+
+pmf <- tibble(x = c(0, 1, 0), y = c(0, 0, 1), fxy = c(1/3, 1/6, 1/2))
+make_cov_plot(pmf)
+```
+
+## Geometric representation (4) {.smaller}
+
+
+```{r}
+n <- 7
+set.seed(123)
+pmf <- tibble(x = runif(n),
+              fxy_raw = runif(n)) |> 
+  mutate(y = x + rnorm(n, sd = 1),
+         fxy = fxy_raw/sum(fxy_raw)) 
+
+make_cov_plot(pmf)
+```
+
+## Geometric representation (5) 
+
+
+```{r}
+n <- 7
+pmf <- tibble(x = runif(n),
+              fxy_raw = runif(n)) |> 
+  mutate(y = -x + rnorm(n, sd = 1),
+         fxy = fxy_raw/sum(fxy_raw)) 
+
+make_cov_plot(pmf)
+```
 
 ## Alternative formulation
 
