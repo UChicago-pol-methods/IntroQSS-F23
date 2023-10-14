@@ -1,0 +1,135 @@
+---
+title: "Week 3: Lab Solutions"
+format: html
+editor: visual
+author: Moksha Sharma
+---
+
+## Functions
+
+A function in R is a mapping from inputs (or arguments) to an output. This is very similar to the mathematical definition of a function. You have already worked with many R functions, even if you haven't thought of them in these terms (e.g. \`mean()\`, \`rnorm()\`, \`sample()\`).
+
+What arguments do you pass into these various functions? What do they give you as output?
+
+With the functions you have used so far, these have been defined for you by either base R (or the packages that you use), but you are free to define your own functions too! This is an extremely powerful tool for tasks that need to be repeated many times.
+
+The basic components of a function are:
+
+-   name (should be descriptive),
+
+-   arguments (these are your inputs), and
+
+-   body (instructions for manipulating the inputs).
+
+## Interpreting Functions
+
+Take a look at this function. Can you describe what it does? What are the components?
+
+`my function <- function(x){`
+
+`x - mean(x, na.rm = TRUE)`
+
+`}`
+
+Generate some data to test your prediction (any method is fine, but make sure it's small enough that you can quickly check if it is working correctly). Put the function in a chunk and call it on your data. Does it work?
+
+```{r}
+demean <- function(x) {  
+  x - mean(x, na.rm = TRUE)
+}
+data <- c(1:10, NA)
+demean(data)
+```
+
+Scatterplot:
+
+```{r}
+demeaned <- demean(data)
+
+plot(data, demeaned)
+
+```
+
+## Writing Functions
+
+Ok, now it's your turn!
+
+Task 1: Write a function that will give you the value of $(a-b)^n$. Before you code anything, think about the information you would need to extract from the data to answer this question. Then figure out how to use those data points to produce the value you want. Then try to produce code to do it for you.
+
+Once you are done, calculate $(20-3)^{94}$.
+
+```{r}
+diff_to_n <- function(a,b,n){
+  (a-b)^n
+}
+
+diff_to_n(20, 3, 94)
+```
+
+Task 2: Write a function that, when fed 3 vectors, will calculate their means and give you the difference. Once you are confident your code is working, test it for the following 3 vectors: $(4,10,38)$, $(26,29,21,100)$, and $(84, 87, 106, 200)$.
+
+Once your function is working, spruce it up by printing out the output as "your answer is...".
+
+```{r}
+diff_means <- diff_means <- function(x,y,z){
+  answer <-  mean(x) - mean(y) - mean(z)
+  print(paste("your answer is", answer))
+}
+
+diff_means(c(4,10,38),
+           c(26,29,21,100),
+           c(84,87,106,200))
+```
+
+## For Loops
+
+The other important coding skill required for this pset is being able to use "for" loops. They are good for iterating the same block of code over the elements of a sequence. In other words, they will execute the same code on a bunch of different items at one go, instead of you having to rewrite the same chunk of code again and again with only modifications to the arguments.
+
+Components of a for loop:
+
+-   the "for" statement, of the form `for (variable in range)`
+
+    -   the variable is a placeholder for the item you are iterating over
+
+    -   the range is derived the vector (can be other objects but let's stick to vector for our purposes) you want to iterate over
+
+-   code block encased in `{}`
+
+### Example
+
+What do you think the following piece of code is doing? After we discuss the code, it.
+
+```{r}
+#nums <- seq(from=1, to = 100, by=2)
+#for (i in 1:length(nums)){
+#  nums[i] - mean(nums)
+#}
+```
+
+Is the output what you expected? If not, discuss why.
+
+**Answer:** The code is working perfectly, but we're are not seeing any output because we did not store it anywhere. The elements of the vector are getting demeaned, but we don't see them anywhere because we did not store them anywhere OUTSIDE of the for loop. So once the loop is done running, the output is lost.
+
+How should we fix it?
+
+```{r}
+nums <- seq(from=1, to = 100, by=2)
+storage <- rep(NA, time = length(nums))
+for (i in 1:length(nums)){
+  storage[i] <- i - mean(nums)
+}
+print(storage)
+```
+
+What if we had the following code instead? Would the code work as above?
+
+```{r}
+nums <- seq(from=1, to = 100, by=2)
+storage <- rep(NA, time = length(nums))
+for (i in length(nums)){
+  storage[i] <- i - mean(nums)
+}
+print(storage)
+```
+
+**Answer:** The code does not work as above because `length(nums)` is a number. So `i in length(nums` is just 1 number, and the code is not iterating over the entire vector. You can use `seq_along` to rectify this issue as well.
