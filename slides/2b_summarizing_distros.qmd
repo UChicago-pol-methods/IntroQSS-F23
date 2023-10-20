@@ -70,6 +70,18 @@ What is $E[X]$? What is $E[Y]$?
 Then compute expectation of $(X - E[X])(Y - E[Y])$ (function of two RVs) as above.
 
 
+## Variance and covariance
+
+Compare: 
+
+\begin{align}\text{Cov}[X, Y] &= E\left[  \color{blue}{(X - E[X])}\color{orange}{(Y - E[Y])} \right] \\  
+\text{V}[X] &= E\left[  \color{blue}{(X - E[X])}\color{blue}{(X - E[X])} \right]\end{align}
+
+. . . 
+
+- Variance of $X$ is covariance between $X$ and itself. 
+- Variance can't be negative but covariance can
+- A justification for $^2$ in variance formula
 
 ## Geometric representation (1) {.smaller}
 
@@ -213,11 +225,100 @@ $$\text{Cov}[X, Y] = E\left[XY\right] - E[X]E[Y]$$
 
 Note: 
 
-- if $E[X] = E[Y] = 0$ (e.g. if recentered), the two formulations look identical
+- if $E[X] = E[Y] = 0$ (e.g. if recentered), both become $E[XY]$
 - geometrically, can think in terms of areas of rectangles
 
 
-. . . 
+
+## Geometry of $E[XY] - E[X]E[Y]$
+
+::::{.columns}
+
+:::{.column column-width="50%"}
+```{r}
+#| fig-width: 4
+#| fig-height: 4
+#| fig-align: center
+
+dat1 <- tibble(x = c(1,3),
+       y = c(1,3),
+       fxy = c(.5, .5)) 
+boxes1 <- tibble(x = c(0, 1, 1, 0, 0,  0, 3, 3, 0, 0),
+                y = c(0, 0, 1, 1, 0,  0, 0, 3, 3, 0),
+                group = c(rep("A", 5), rep("B", 5)))
+dat1 |> 
+  ggplot(aes(x, y)) + 
+  geom_point(aes(size = fxy), show.legend = F) + 
+  coord_fixed(xlim = c(0,4), ylim = c(0,4)) -> p1
+
+p1
+
+```
+
+
+:::
+:::{.column column-width="50%"}
+```{r}
+#| fig-width: 4
+#| fig-height: 4
+#| fig-align: center
+dat2 <- tibble(x = c(1,3),
+       y = c(3,1),
+       fxy = c(.5, .5))
+boxes2 <- tibble(x = c(0, 1, 1, 0, 0,  0, 3, 3, 0, 0),
+                y = c(0, 0, 3, 3, 0,  0, 0, 1, 1, 0),
+                group = c(rep("A", 5), rep("B", 5)))
+
+dat2 |> 
+  ggplot(aes(x, y)) + 
+  geom_point(aes(size = fxy), show.legend = F) +
+  coord_fixed(xlim = c(0,4), ylim = c(0,4)) -> p2
+
+p2
+
+```
+
+:::
+::::
+
+
+
+## Geometry of $E[XY] - E[X]E[Y]$ (2)
+
+::::{.columns}
+
+:::{.column column-width="50%"}
+```{r}
+#| fig-width: 4
+#| fig-height: 4
+#| fig-align: center
+
+p1 + 
+  geom_polygon(data = boxes1, aes(fill = group, group = group), alpha = .5, show.legend = F) + 
+  scale_fill_manual(values = c("red", "blue")) + 
+  geom_vline(xintercept = 2, lty = 2) + 
+  geom_hline(yintercept = 2, lty = 2)
+  
+```
+
+
+:::
+:::{.column column-width="50%"}
+```{r}
+#| fig-width: 4
+#| fig-height: 4
+#| fig-align: center
+
+p2 + 
+  geom_polygon(data = boxes2, aes(fill = group, group = group), alpha = .5, show.legend = F) + 
+  scale_fill_manual(values = c("red", "blue")) +
+  geom_vline(xintercept = 2, lty = 2) + 
+  geom_hline(yintercept = 2, lty = 2)
+
+```
+
+:::
+::::
 
 ## Linearity of expectations, but not variances 
 
@@ -227,9 +328,7 @@ If $f$ is  a *linear function* or *linear operator*, then $f(x + y) = f(x) + f(y
 
 <br>
 
-Recall that $E[X + Y] = E[X] + E[Y]$. 
-
-Why? 
+Recall linearity of expectations: $E[X + Y] = E[X] + E[Y]$. 
 
 . . . 
 
@@ -255,7 +354,7 @@ $$\begin{aligned}
 \end{aligned}$$
 
 
-## Covariance, correlation, and independence  {.smaller}
+## Correlation 
 
 The **correlation** of two RVs $X$ and $Y$ with $\sigma[X] > 0$ and $\sigma[Y] > 0$ is 
 
@@ -263,52 +362,109 @@ $$ \rho[X, Y] = \frac{\text{Cov}[X, Y]}{\sigma[X] \sigma[Y]}$$
 
 . . .
 
-A rescaled, **scale-invariant** version of covariance:  $\rho[X, Y] = \rho[aX, bY]$ for $a, b > 0$
+Correlation is **scale-invariant**: $\rho[X, Y] = \rho[aX, bY]$ for $a, b > 0$
 
 . . . 
 
-If $X$ and $Y$ are independent, then 
-
-- zero covariance
-- zero correlation
-- $V[X + Y] = V[X] + V[Y]$
+Prove it! 
 
 
-## Conditional expectation: definition (2.2.10)
+## Proof of scale-invariance of correlation  {.smaller}
 
-Discrete version: 
+\begin{align}
+\text{Cov}[aX, bY] &= E[aX bY] - E[aX]E[bY] \\
+&= ab E[XY] - ab E[X]E[Y] \\
+&= ab (E[XY] - E[X]E[Y]) \\ 
+&= ab \text{Cov}[X, Y] 
+\end{align}
 
-$$E [Y | X = x] = \sum_y y f_{Y|X}(y | x)$$ 
+. . . 
 
-i.e. the expectation of $Y$ at some $x$. 
+
+$$\sigma[aX] = \sqrt{\text{V}[aX]} = \sqrt{a^2 \text{V}[X]} = a \sigma[X]$$ 
 
 . . .
 
-Continuous version: 
+By same argument, $\sigma[bY] = b\sigma[Y]$.
 
-$$E [Y | X = x] = \int_{-\infty}^\infty y f_{Y|X}(y | x) \, dy$$
+. . . 
+
+So
+
+\begin{align} 
+\rho[aX, bY] &= \frac{\text{Cov}[aX, bY]}{\sigma[aX] \sigma[bY]} \\ 
+&= \frac{ab \text{Cov}[X, Y]}{a \sigma[X] b \sigma[Y]} = \frac{\text{Cov}[X, Y]}{\sigma[X] \sigma[Y]} \\ 
+&= \rho[X, y]
+\end{align}
+
+## Conditional expectations {.smaller}
+
+We spent time on **expectations**: 
+
+$$E[Y] = \sum_y y f(y).$$
+
+. . . 
+
+Also on **conditional distributions**: 
+
+$$f_{Y|X}(y|x) = \frac{f(x, y)}{f_X(x)}$$
+
+. . . 
+
+Combining the two ideas, we get **conditional expectations**: 
+
+$$E[Y \mid X = x] = \sum_y y f_{Y|X}(y \mid x).$$
+
+i.e. the expectation of $Y$ at some $x$.
 
 
-## Conditional expectation: illustration  {.smaller}
-
-Suppose $f_X(x)$ is uniform, and $f_{Y|X}(y|x)$ normal, with mean of $3x + 8x^2 - 3x^3$ and variance of $9$.
-
-Then what is $E [Y | X = 1]$?
+## Illustration 
 
 
 ```{r}
 #| fig-align: center
+#| fig-width: 6
+#| fig-height: 4
 n <- 1000
-dat <- tibble(x = runif(n, min = 0, max = 2.75)) |> 
+dat <- tibble(x = runif(n, min = -.5, max = 3)) |> 
+  mutate(mu = 3*x + 8*x^2 - 3*x^3,
+         y = rnorm(n, mean = mu, sd = 3))
+p1 <- dat |> 
+  ggplot(aes(x = x, y = y)) + 
+  geom_point(alpha = .5, size = 2) +
+  theme_bw() + 
+  geom_line(aes(y = mu), col = "red", lwd = 2) + 
+  coord_cartesian(xlim = c(0, 2.75),
+                  ylim = c(-10, 25)) 
+p1
+```
+
+[(Red line represents $E[Y | X = x]$, dots a sample from $f(x, y)$)]{.gray}
+
+
+## Illustration (2)
+
+
+```{r}
+#| fig-align: center
+#| fig-width: 6
+#| fig-height: 4
+n <- 1500
+dat <- tibble(x = rnorm(n, mean = 2)) |> 
   mutate(mu = 3*x + 8*x^2 - 3*x^3,
          y = rnorm(n, mean = mu, sd = 3))
 p <- dat |> 
   ggplot(aes(x = x, y = y)) + 
   geom_point(alpha = .5, size = 2) +
   theme_bw() + 
-  geom_line(aes(y = mu), col = "red", lwd = 2)
+  geom_line(aes(y = mu), col = "red", lwd = 2) + 
+  coord_cartesian(xlim = c(0, 2.75),
+                  ylim = c(-10, 25)) 
 p
 ```
+
+[(Red line represents $E[Y | X = x]$, dots a sample from $f(x, y)$)]{.gray}
+
 
 
 
@@ -323,7 +479,7 @@ $$V[Y | X = x] = E[Y^2 | X = x] - E[Y | X =x]^2$$
 
 ```{r}
 #| fig-align: center
-p
+p1
 ```
 
 
@@ -349,21 +505,15 @@ tibble(x = runif(n, min = 0, max = 2.75)) |>
 
 
 
-## Conditional Expectation Function (CEF) {.smaller}
+## Conditional expectations vs Conditional expectation function (CEF) {.smaller}
 
 Conditional expectation $E[Y | X = x]$ is for a specific $x$.
 
 Conditional expectation function (CEF) $E[Y | X]$ is for all $x$.
 
-. . . 
-
-Suppose again $f_X(x)$ is uniform, and $f_{Y|X}(y|x)$ normal, with mean of $3x + 8x^2 - 3x^3$ and variance of $9$.
-
-Then what is $E [Y | X ]$?
 
 ```{r}
-#| fig-height: 3.5
-p
+p1 
 ```
 
 
@@ -381,12 +531,12 @@ We already established that the expectation/mean is the best (in MSE sense) pred
 
 So CEF is the best possible way to use $X$ to predict $Y$.  (See Theorem 2.2.20.)
 
+. . . 
+
+**Multivariate generalization**: $E[Y \mid X_1, X_2, X_3, \ldots, X_n]$ is the best way to use $X_1, \ldots X_n$ to predict $Y$. 
 
 
-
-## Law of iterated expectations
-
-**Theorem 2.2.17**. *Law of iterated expectations*
+## Law of iterated expectations {.smaller}
 
 For random variables $X$ and $Y$,
 
@@ -394,10 +544,22 @@ $$E[Y] = E[E[Y | X]]$$
 
 . . . 
 
-In words: to get the average of $Y$, you can take the average of $Y$ within levels of $X$ and then average those according to the distribution of $X$.
+This means there are two ways to get $E[Y]$:
 
-[(Very similar to the law of total probability.)]{.gray}
+- start with $f(y)$, take expectations: $E[Y] = \sum_y y f(y)$
+<!-- - start with $f(x, y)$, get $f_Y(y) = \sum_x f(x, y)$, take expectations: $E[Y] = \sum_y y f_Y(y)$ -->
+- start with $E[Y \mid X]$ and $f_X(x)$, take expectations: $E[Y] = \sum_x E[Y \mid X=x] f_X(x)$ 
 
+. . . 
+
+In words: An unconditional average ($E[Y]$) can be represented as a weighted average of conditional expectations ($E[Y \mid X]$) with weights taken from the distribution of the variable conditioned on, i.e. $X$.
+
+. . .
+
+<!-- understand two formulations for conditional variance --> 
+
+Why would you want to do that? 
+<!-- connection to LTP --> 
 
 
 ## LIE: An intuitive example
@@ -421,7 +583,7 @@ See homework for another example.
 ## LIE: another example
 
 ```{r, echo = F}
-p
+p1
 ```
 
 
@@ -447,16 +609,19 @@ Suppose we want to measure the average effect of participating in a program (e.g
 
 . . . 
 
-Call $\tau_i$ the [(unobservable)]{.gray} treatment effect for unit $i$. We want the **average treatment effect** (ATE), $E[\tau_i]$.
+Call $Y$ the [(unobservable)]{.gray} effect of the treatment. We want the **average treatment effect** (ATE), $E[Y]$.
 
 . . . 
 
-Suppose comparing all participants to all non-participants produces a **biased** estimate, but we can get a good estimate of the effect in each subgroup defined by participant background $(X)$.
+Suppose that comparing participants and non-participants gives us a good estimate of the average treatment effect only within subgroups defined by age ($X$).
 
 . . . 
 
-Then we can combine subgroup estimates because (by LIE) $E[\tau_i] = E[E[Y \mid X]]$. 
+So we have $E[Y \mid X]$. 
 
+. . .
+
+Now we just combine these estimates (by LIE): $E[Y] = E[E[Y \mid X]] = \sum_{x}  E[Y \mid X = x] f(x)$
 
 
 
@@ -467,27 +632,20 @@ $$V[Y] = E[V[Y|X]] + V[E[Y|X]]$$
 
 . . . 
 
-```{r, echo = F}
-p
-```
+In words, the variance of $Y$ can be **decomposed** into the expected conditional variance [($E[V[Y|X]]$)]{.gray} and the variance of the conditional expectation [($V[E[Y|X]]$)]{.gray}.
 
-<!-- 
+. . . 
+
+Sometimes called "Ev(v)e's law" because 
+
+$$V[Y] = \color{red}{E}[\color{red}{V}[Y|X]] + \color{red}{V}[\color{red}{E}[Y|X]]$$
+
 ## Law of total variance (2)
 
-This will be approximately true of a sample (esp. when we know the CEF):
 
-```{r}
-head(dat, 4)
+```{r, echo = F}
+p1
 ```
-
-```{r}
-dat |> 
-  summarize(var(y), var(y - mu), var(mu))
-```
-
-Sample variance of $Y$ equals (approx) sample variance of errors plus sample variance of CEF.
---> 
-
 
 
 
@@ -539,7 +697,29 @@ $$(\alpha, \beta) = \underset{(a,b) \in \mathbb{R}^2}{\arg\min} \, \mathrm{E}\,[
 
 
 ```{r, echo = F, fig.height = 3.5}
-p + 
+p1 + 
   geom_smooth(method = lm)
 ```
+
+
+
+<!-- 
+## Law of total variance (2)
+
+This will be approximately true of a sample (esp. when we know the CEF):
+
+```{r}
+head(dat, 4)
+```
+
+```{r}
+dat |> 
+  summarize(var(y), var(y - mu), var(mu))
+```
+
+Sample variance of $Y$ equals (approx) sample variance of errors plus sample variance of CEF.
+--> 
+
+
+
 
