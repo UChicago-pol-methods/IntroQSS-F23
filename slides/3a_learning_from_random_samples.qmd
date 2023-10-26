@@ -366,10 +366,11 @@ If  $E[\hat{\theta}] = \theta$, $\hat{\theta}$ is **unbiased**.
 
 . . . 
 
-Basically, 
+For example, 
 
 - define **estimand** in terms of population expectations, and 
 - turn it into an **estimator** by replacing population expectations by sample means.
+
 
 
 
@@ -525,7 +526,7 @@ If our sample is unrepresentative in one direction, so is $\overline{X}$, making
 ## Variances to keep straight {.smaller}
 
 - $\V[X]$: the (population) variance of $X$
-- $\V[\overline{X}]$: the variance of the sample mean
+- $\V[\overline{X}]$: the (sampling) variance of the sample mean
 - $\hat{\text{V}}_{\text{plug-in}}[X]$: the plug-in sample variance
 - $\hat{\text{V}}[X]$: the unbiased sample variance: $\frac{n}{n-1}\hat{\text{V}}_{\text{plug-in}}[X]$
 
@@ -536,12 +537,12 @@ Common situation:
 - we have a sample of size $n$
 - we want to estimate a sample mean $\overline{X}$
 - we want to describe the variance of the sample mean $\V[\overline{X}]$ (why?)
-- we use $\hat{\text{V}}[X]/n$
+- we don't know $\V[X]$, so we use $\hat{\text{V}}[X]/n$
 
 
 ## Plug-in principle wrap-up (for now)
 
-- Many estimands can be expressed in terms of population expectations (e.g. $E[X], E[XY]$)
+- Many estimands can be expressed in terms of population expectations (e.g. $\E[X], \E[XY]$)
 - Sample means (e.g. $\overline{X}, \overline{XY}$) are good approximations of population expectations
 - "Plug in" the sample means and you have a plug-in estimator
 
@@ -583,7 +584,7 @@ $$
 
 . . . 
 
-If we repeatedly draw a sample of size $n$ and record the sample mean each time, what will the distribution of these sample means look like? [(The sampling distribution of the sample mean.)]{.gray}
+If we draw 10,000 samples of size $n$ and record the sample mean each time, what will the distribution of these sample means look like? [(The sampling distribution of the sample mean.)]{.gray}
 
 
 
@@ -720,9 +721,9 @@ ks <- 0:1000 # number of heads
 n <- 1000 # sample size
 
 nways <- rep(NA, 1001) # storage for for-loop
-for(k in ks){
+for(i in 1:length(ks)){
   # number of ways to get k successes in n trials
-  nways[k+1] <- choose(k = k, n = n) 
+  nways[i] <- choose(k = ks[i], n = n) 
 }
 head(nways, 4)
 ```
