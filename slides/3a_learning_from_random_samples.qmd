@@ -715,6 +715,8 @@ choose(n = 1000, k = 500)
 
 ## CLT intuition for Bernoulli RV (3) 
 
+Let's compute the number of ways to each number of heads between 0 and 1000 in 1000 tries:
+
 ```{r}
 #| echo: true
 ks <- 0:1000 # number of heads
@@ -729,23 +731,26 @@ head(nways, 4)
 ```
 
 
-## CLT intuition for Bernoulli RV (4)
+## CLT intuition for Bernoulli RV (4) {.smaller}
+
+Since each sequence of flips is equally likely, we can convert "number of ways" into "probability" by dividing by the total number of possible sequences. 
+
 
 ```{r}
 #| echo: true
 plot(ks/1000, nways/sum(nways), pch = 19, cex = .25, 
-     xlab = "Sample mean", ylab = "Probability in 1000 trials")
+     xlab = "Proportion of heads in 1000 tries", ylab = "Probability of observing this proportion")
 ```
 
 ## CLT intuition for Bernoulli RV (5) {.smaller}
 
 ```{r}
 plot(ks/1000, nways/sum(nways), pch = 19, cex = .25, 
-     xlab = "Sample mean", ylab = "Probability in 1000 trials",
+     xlab = "Proportion of heads in 1000 tries", ylab = "Probability of observing this proportion",
      xlim = c(.4, .6))
 x <- seq(.4, .6, length = 1000)
 lines(x, dnorm(x, mean = .5, sd = sqrt(.5^2/1000))/1000, col = "blue")
-text(x = .55, y = .02, labels = "Black dots: probability that\nsample mean is x (in 1000 trials)\nBlue line: normal distribution")
+text(x = .55, y = .02, labels = "Black dots: probability of\nobserving this proportion\nBlue line: normal distribution")
 ```
 
 ## CLT intuition more broadly
@@ -765,10 +770,10 @@ Extend that intuition to other $X$'s:
 ## Galton board
 
 
-![](assets/galton_board.png){fig-align="center"}
+![](assets/galton_board_desktop.png){fig-align="center"}
 
 
-Source: <https://youtu.be/3m4bxse2JEQ?t=51>
+Source: <https://www.youtube.com/watch?v=EvHiee7gs9Y>
 
 
 
@@ -838,4 +843,33 @@ plot_function(dat, mean_x = exp(1/2), sd_x = sqrt(exp(1)^2 - exp(1)), title = "X
 ```
 
 
+## CLT: not just for sample means  {.smaller}
 
+We focused on the sample mean, but (given "mild regularity conditions") *all plug-in estimators* are asymptotically normal (Theorem 3.3.6). 
+
+(*Mild regularity conditions* means that small changes in the CDF produce small changes in our sample statistic [(technically *statistical functional*)]{.gray}.)
+
+. . . 
+
+<br>
+
+Intuition: 
+
+- all estimands can be represented as functions of CDF; all plug-in estimators can be described as functions of the empirical CDF 
+- across samples, empirical CDF (in sample) will resemble population CDF with mostly small discrepancies, some larger discrepancies
+- we get normal sampling distribution of $\hat{\theta}$ if small discrepancies in CDF produce small deviations $\hat{\theta} - \theta$, large discrep. produce large $\hat{\theta} - \theta$
+
+
+## When the CLT does not apply
+
+So when does the CLT **not** apply?
+
+. . .
+
+Some examples: 
+
+- mode of a discrete RV that takes on few values (e.g. Bernoulli)
+- mode or other quantile of a discrete RV that takes on few values
+
+
+<!-- could make a picture here: original distribution, sampling distribution of mode --> 
