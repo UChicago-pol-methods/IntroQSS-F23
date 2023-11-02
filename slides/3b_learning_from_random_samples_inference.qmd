@@ -150,7 +150,7 @@ In the frequentist view, $\theta$ is fixed and $CI$ is the random variable; the 
 
 
 :::{.column column-width="50%"}
-Suppose we know that $\hat{\theta}$ is distributed normally with mean $\theta$ and variance $\hat{\sigma}^2$ (i.e. $N(\theta, \hat{\sigma}^2)$.
+Suppose we know that $\hat{\theta}$ is distributed normally with mean $\theta$ and variance $\sigma^2$ (i.e. $N(\theta, \sigma)$.
 
 
 For now, suppose we know $\theta$. [(Remember, in real life we don't.)]{.gray}
@@ -182,25 +182,17 @@ norm_tail_plot(inner = 1.96*c(-1, 1)) +
 ::::{.columns}
 
 
-:::{.column column-width="50%"}
+:::{.column column-width="60%"}
 
-Because $\hat{\theta}$ follows normal distribution, the shortest interval $[a,b]$ that will contain $\hat{\theta}$ 95% of the time is
-
-\begin{align}
-a &= \theta - 1.96 \hat{\sigma} \\
-b &= \theta + 1.96 \hat{\sigma} 
-\end{align}
+Because $\hat{\theta}$ is normally distributed, the shortest interval $[a,b]$ that will contain $\hat{\theta}$ 95% of the time is
+$$[\theta - 1.96 \sigma, \theta + 1.96 \sigma]$$ 
 
 For 90% interval,
-
-\begin{align}
-a &= \theta - 1.64 \hat{\sigma} \\
-b &= \theta + 1.64 \hat{\sigma} 
-\end{align}
+$$[\theta - 1.64 \sigma, \theta + 1.64 \sigma]$$ 
 
 :::
 
-:::{.column column-width="50%"}
+:::{.column column-width="40%"}
 
 ```{r}
 #| fig-height: 3
@@ -263,35 +255,35 @@ norm_tail_plot(lower = -1.96, upper = 1.96) +
 
 ## Demonstration
 
-Everyone use `R` to draw a single value from normal distribution with mean 4 and sd 1.5.
+Everyone use `R` to draw a single value from normal distribution with mean 4 and sd 2.
 
 . . . 
 
 ```{r}
 #| eval: false
-rnorm(n = 1, mean = 4, sd = 1.5)
+rnorm(n = 1, mean = 4, sd = 2)
 ```
 
 . . . 
 
 What proportion of draws are 
 
-- outside the interval $[4 - 1.96 \times 1.5, 4 + 1.96 \times 1.5] = [1.05, 6.94]$? <!-- should be 5% -->
-- outside the interval $[4 - 1.64 \times 1.5, 4 + 1.64 \times 1.5] = [1.54, 6.46]$? <!-- should be 10% -->
+- outside the interval $[4 - 1.96 \times 2, 4 + 1.96 \times 2] = [0.08, 7.92]$? <!-- should be 5% -->
+- outside the interval $[4 - 1.64 \times 2, 4 + 1.64 \times 2] = [.72, 7.28]$? <!-- should be 10% -->
 
 . . . 
 
 ```{r}
 #| eval: false
-draws <- rnorm(10000, mean = 4, sd = 1.5)
-mean(draws < 1.05 | draws > 6.94)
+draws <- rnorm(10000, mean = 4, sd = 2)
+mean(draws < .08 | draws > 7.92)
 ```
 
 ## CI construction (3)
 
-We have an interval that contains 95% of $\hat{\theta}$ draws, given $\theta$.
+We have an interval that contains 95% of $\hat{\theta}$ draws, given $\theta$ and $\sigma$.
 
-We want an interval that contains $\theta$ 95% of the time, given $\hat{\theta}$.
+We want an interval that contains $\theta$ 95% of the time, given $\hat{\theta}$ and $\hat{\sigma}$.
 
 . . . 
 
@@ -299,24 +291,29 @@ Consider this interval:
 
 $$\left[ \hat{\theta} - 1.96 \hat{\sigma},  \hat{\theta} + 1.96 \hat{\sigma} \right] $$
 
-We can construct it without knowing $\theta$, and it contains $\theta$ 95% of the time!
+We can construct it without knowing $\theta$, and (asymptotically) it contains $\theta$ 95% of the time!
 
 
 ## CI construction (4) 
 
 ```{r}
-norm_tail_plot(lower = -1.96, upper = 1.96) + 
+#| fig-width: 5
+#| fig-height: 3.25
+#| out-width: 90%
+#| out-align: center
+norm_tail_plot(lower = -1.96, upper = 1.96, inner = c(-1.96, 1.96)) + 
   scale_x_continuous(breaks = c(-1.96, 0, 1.96), labels = c(expression(theta~"-1.96"~hat(sigma)), expression(theta), expression(theta~"+1.96"~hat(sigma)))) + 
   labs(x = expression(hat(theta)), y = expression(f(hat(theta)))) + 
-  annotate(geom = "text", x = -2.8, y = .05, label = "Samples where\nCI too low") +
-  annotate(geom = "text", x = 2.8, y = .05, label = "Samples where\nCI too high")
+  annotate(geom = "text", x = -2.85, y = .06, label = "Samples where\nCI too low", size = 3) +
+  annotate(geom = "text", x = 2.85, y = .06, label = "Samples where\nCI too high", size = 3) + 
+  annotate(geom = "text", x = 0, y = .1, label = "Samples where\nCI contains theta", size = 3)
   
 ```
 
 
 ## Demonstration 2
 
-Everyone use `R` to draw a sample of size $n=500$ from normal distribution with mean 4 and sd 1.5. Using your sample, make a 90% confidence interval for the population mean:
+Everyone use `R` to draw a sample of size $n=400$ from normal distribution with mean 4 and sd 2. Using your sample, make a 90% confidence interval for the population mean:
 
 - get $\hat{\theta}$ and $\hat{\sigma}$
 - make $\left[ \hat{\theta} - 1.64 \hat{\sigma},  \hat{\theta} + 1.64 \hat{\sigma} \right]$
@@ -329,9 +326,9 @@ Does your CI include $4$ (the population mean)?
 
 ```{r}
 #| echo: true
-samp <- rnorm(n = 500, mean = 4, sd = 1.5)
+samp <- rnorm(n = 400, mean = 4, sd = 2)
 hat_theta <- mean(samp)
-hat_sigma <- sd(samp)
+hat_sigma <- sd(samp)/sqrt(400)
 # lower bound
 hat_theta - 1.64*hat_sigma
 # upper bound
@@ -342,16 +339,16 @@ hat_theta + 1.64*hat_sigma
 ## Illustration: 90% confidence interval
 
 ```{r}
-pop <- rnorm(5000, mean = 4, sd = 1.5)
+pop <- rnorm(5000, mean = 4, sd = 2)
 pop <- pop + (4 - mean(pop))
 m <- 500 # number of CIs 
-n <- 500 # sample size
+n <- 400 # sample size
 ci_lower <- ci_upper <- means <- rep(NA, m)
 for(i in 1:m){
   samp <- sample(pop, size = n)
   means[i] <- mean(samp)
-  ci_lower[i] <- mean(samp) - 1.64*sqrt(var(samp)/n)
-  ci_upper[i] <- mean(samp) + 1.64*sqrt(var(samp)/n)
+  ci_lower[i] <- mean(samp) - 1.64*sd(samp)/sqrt(n)
+  ci_upper[i] <- mean(samp) + 1.64*sd(samp)/sqrt(n)
 }
 tibble(ci_lower, ci_upper, means) |> 
   mutate(j = 1:m,
@@ -359,14 +356,15 @@ tibble(ci_lower, ci_upper, means) |>
 
 dat |> 
   ggplot(aes(y = j, x = means, xmin = ci_lower, xmax = ci_upper, col = contains)) + 
-  geom_pointrange(alpha = .5, size = .05) + 
+  geom_linerange(alpha = .5) + 
+  geom_point(size = .1, col ="black") + 
   scale_color_manual(values = rev(c("red", "lightgray"))) + 
   theme_bw() + 
   theme(axis.title.y = element_blank(),
         axis.text.y = element_blank(),
         axis.ticks.y = element_blank()) +
   geom_vline(xintercept = mean(pop), lty = 2) + 
-  labs(x = "Population mean", y = "", col = "", title = str_c(m, " 90% confidence intervals: ", 100*round(mean(dat$contains == "Contains"), 3), "% contain estimand"))
+  labs(x = "Population mean", y = "Iteration", col = "", title = str_c(m, " 90% confidence intervals: ", 100*round(mean(dat$contains == "Contains"), 3), "% contain estimand"))
 
 ```
 
@@ -388,14 +386,15 @@ tibble(ci_lower, ci_upper, means) |>
 
 dat |> 
   ggplot(aes(y = j, x = means, xmin = ci_lower, xmax = ci_upper, col = contains)) + 
-  geom_pointrange(alpha = .5, size = .05) + 
+  geom_linerange(alpha = .5) + 
+  geom_point(size = .1, col ="black") + 
   scale_color_manual(values = rev(c("red", "lightgray"))) + 
   theme_bw() + 
   theme(axis.title.y = element_blank(),
         axis.text.y = element_blank(),
         axis.ticks.y = element_blank()) +
   geom_vline(xintercept = mean(pop), lty = 2) + 
-  labs(x = "Population mean", y = "", col = "", title = str_c(m, " 99% confidence intervals: ", 100*round(mean(dat$contains == "Contains"), 3), "% contain estimand"))
+  labs(x = "Population mean", y = "Iteration", col = "", title = str_c(m, " 99% confidence intervals: ", 100*round(mean(dat$contains == "Contains"), 3), "% contain estimand"))
 
 ```
 
@@ -406,67 +405,397 @@ As a **frequentist** concept, the confidence interval is about a long-run averag
 
 . . . 
 
-What about in a particular case? Can I say, "The probability that $\theta$ is in this confidence interval is .95"?
+What about in a particular case? Can I say, "The probability that this CI contains $\theta$ is .95"?
 
 . . .
 
-- A strict frequentist says **no**: "$\theta$ is either in the CI or it isn't. Probability is for long-run averages, not for your beliefs."
-- I (not a strict frequentist) say **yes**: "It's okay to describe beliefs with probability. 95% of my CIs contain $\theta$, so $\text{Pr}(\text{this CI contains } \theta) \approx .95$."
+- Strict frequentist says "**NO.** $\theta$ is either in this CI or it isn't. Probability is for long-run averages, not your beliefs."
+- I (not a strict frequentist) say, "It's OK to describe beliefs with probability. 95% of my CIs contain $\theta$, so $\text{Pr}(\text{this CI contains } \theta) \approx .95$."
 
 
-# p-values 
+# Hypothesis testing and p-values {background-image="assets/sherlock_nyt.png" background-size="600px" background-position="right"}
+
+<!-- illustration credit: https://www.nytimes.com/2013/03/07/books/suit-says-sherlock-belongs-to-the-ages.html --> 
+
 
 <!-- When would p-value ($\text{Pr}[\hat{\theta} = \hat{\theta}* \mid \theta = \theta_0 ]$) be far from $\text{Pr}[\theta = \theta_0 \mid \hat{\theta} = \hat{\theta}*]$? --> 
 
 <!-- figure of a lower p-value --> 
 
-## $p$-value: motivation {.smaller}
+## Hypothesis testing: motivation {.smaller}
 
-You have 
+With confidence intervals, we report an interval centered on estimate $\hat{\theta}^*$ that is likely [(in either frequentist or Bayesian sense)]{.gray} to contain the estimand $\theta$.
 
-- an estimand $\theta$, 
-- an estimator $\hat{\theta}$, and 
-- an observed value $\hat{\theta}^*$
-- a null hypothesis (a conjecture to evaluate, "test against")
 
-(For example: a public opinion survey estimating support for gun control; null hypothesis might be $\theta = .5$.)
+. . .
+
+Another approach: **hypothesis testing**.
+
+Basic idea:
+
+- specify a **null hypothesis** $\theta_0$: a possible value of $\theta$ [(typically one you're arguing against)]{.gray}
+- say how unlikely your result (or a more extreme one) would be if null hypothesis were true ($p$-value)
+
+The more unlikely your result $\hat{\theta}^*$ would be under the null hypothesis (i.e. the lower the $p$-value), the more doubtful the null hypothesis appears.
+
+
+## The logic of hypothesis testing {.smaller}
+
+Similar to **proof by contradiction** [(modus tollens)]{.gray}: 
+
+- "If $A$, then $B$; but $B$ is false, so $A$ is false."
+- "If he loved me, then he would have called; he didn't call, so he doesn't love me."   
 
 . . . 
 
-$p$-value answers a question: how likely would we see something as low/high/extreme as $\hat{\theta}^*$ if the true value of $\theta$ were $\theta_0$?
+But it's a **probabilistic version** [(weak syllogism)]{.gray}: 
 
-## $p$-value: definitions
+- "If $A$, then $B$ likely; but $B$ is false, so $A$ is less likely"
+- "If he loved me, then he *probably* would have called; he didn't call, so it's less likely that he loves me"
 
-lower/upper/two-tailed
+. . . 
 
+"Less likely" is logically warranted: 
+$$\text{Pr}[\text{loves} \mid \text{no call}] < \text{Pr}[\text{loves} \mid \text{call}]$$
 
-## Procedure for asymptotically valid $p$-values
-
-This is not just for the sample mean -- it's for any asymptotically normal estimator.
-
-$t$-statistic: estimate minus null over standard error.
-
-Asymptotically, this has standard normal distribution.
-
-So we get area under the tail or tails.
+"Unlikely" (e.g. $\text{Pr}[\text{loves} \mid \text{no call}] < .5$) is not.
 
 
-## Showing tails
+## $p$-value logic (1)
+
+::::{.columns}
+:::{.column column-width="60%"}
+
+
+**Remember**: for large enough $n$, a plug-in estimator $\hat{\theta}$ is normally distributed around estimand $\theta$ if
+
+- unbiased (or consistent), and
+- "mild regularity conditions" hold
+
+But we don't know $\theta$.
+
+:::
+
+:::{.column column-width="40%"}
 
 ```{r}
-norm_tail_plot(lower = -1.96, upper = 1)
+#| fig-height: 3
+#| fig-width: 3
+#| fig-align: center
+#| out-width: "200%"
+norm_tail_plot() + 
+  scale_x_continuous(breaks = c(-1.96, 0, 1.96), labels = c(expression(theta~"-1.96"~sigma), expression(theta), expression(theta~"+1.96"~sigma))) + 
+  labs(x = expression(hat(theta)), y = expression(f(hat(theta))))
 ```
 
 
-## Interpretation of p-values 
+:::
+::::
+
+
+
+## $p$-value logic (2)
+
+::::{.columns}
+:::{.column column-width="60%"}
+
+But we can say, "Suppose $\theta = \theta_0$".
+
+Then* we know that
+
+$$\hat{\theta} \sim N(\theta_0, \hat{\sigma}^2)$$
+and we can estimate the probability that $\hat{\theta}$ would be in any interval, given $\theta_0$. 
+
+
+:::
+
+:::{.column column-width="40%"}
+
+```{r}
+#| fig-height: 2.75
+#| fig-width: 3
+#| fig-align: center
+#| out-width: "200%"
+norm_tail_plot(inner = c(-.5, 1.1)) + 
+  scale_x_continuous(breaks = c(-1.96, 0, 1.96), labels = c(expression(theta[0]~"-1.96"~hat(sigma)), expression(theta[0]), expression(theta[0]~"+1.96"~hat(sigma)))) + 
+  labs(x = expression(hat(theta)), y = expression(f(hat(theta))))
+```
+
+:::
+::::
+
+*Asymptotically, and if $\text{V}[\hat{\theta} \mid \theta = \theta_0] = \text{V}[\hat{\theta}]$ 
+
+
+
+## The lower one-tailed $p$-value
+
+::::{.columns}
+:::{.column column-width="60%"}
+
+Lower one-tailed p-value: 
+
+$$\text{Pr}[\hat{\theta} \leq \hat{\theta}^* \mid \theta = \theta_0]$$
+
+:::
+
+:::{.column column-width="40%"}
+
+```{r}
+#| fig-height: 3
+#| fig-width: 3
+#| fig-align: center
+#| out-width: "200%"
+norm_tail_plot(lower = c(-1.2)) + 
+  scale_x_continuous(breaks = c(-1.96, -1.2, 0, 1.96), labels = c("", expression(hat(theta)~"*"), expression(theta[0]), "")) + 
+  labs(x = expression(hat(theta)), y = expression(f(hat(theta))~" given "~theta[0]))
+```
+
+
+:::
+::::
+
+
+
+## The upper one-tailed $p$-value
+
+::::{.columns}
+:::{.column column-width="60%"}
+
+Upper one-tailed p-value: 
+
+$$\text{Pr}[\hat{\theta} \geq \hat{\theta}^* \mid \theta = \theta_0]$$
+
+:::
+
+:::{.column column-width="40%"}
+
+```{r}
+#| fig-height: 3
+#| fig-width: 3
+#| fig-align: center
+#| out-width: "200%"
+norm_tail_plot(upper = c(1.2)) + 
+  scale_x_continuous(breaks = c(-1.96, 0, 1.2, 1.96), labels = c("", expression(theta[0]), expression(hat(theta)~"*"), "")) + 
+  labs(x = expression(hat(theta)), y = expression(f(hat(theta))~" given "~theta[0]))
+```
+
+
+:::
+::::
+
+
+
+
+
+## The two-tailed $p$-value
+
+Two-tailed p-value: $\text{Pr}\left[|\hat{\theta} - \theta_0| \geq |\hat{\theta}^* - \theta_0| \mid \theta = \theta_0\right]$
+
+```{r}
+#| fig-width: 4
+#| fig-height: 3
+#| fig-align: center
+#| out-width: 70%
+norm_tail_plot(upper = c(1.2), lower = -1.2) + 
+  scale_x_continuous(breaks = c(-1.96, -1.2, 0, 1.2, 1.96), labels = c("", expression("-|"~hat(theta)~"*"~"|"), expression(theta[0]), expression("|"~hat(theta)~"*"~"|"), "")) + 
+  labs(x = expression(hat(theta)), y = expression(f(hat(theta))~" given "~theta[0]))
+```
+
+
+
+## Computing $p$-values (1) {.smaller}
+
+It is useful to transform our estimate $\hat{\theta}^*$ into a $t$-statistic: 
+
+$$t = \frac{\hat{\theta}^* - \theta_0}{\sqrt{\hat{\text{V}}[\hat{\theta}]}} $$
+
+In words: the difference between the estimate and the null, divided by the standard error of the estimator.
+
+. . . 
+
+$|t|$ gets bigger when 
+
+- estimate gets further from null, or 
+- estimator gets more precise
+
+. . . 
+
+If the null is true ($\theta = \theta_0$), then asymptotically $t \sim N(0, 1)$.
+
+## Computing $p$-values (2)
+
+::::{.columns}
+:::{.column column-width="60%"}
+
+Suppose $t^*$ (the observed $t$) is $-1.5$.
+
+Since asymptotically $t \sim N(0, 1)$ under null hypothesis, we can compute asymptotically valid **lower one-tailed** $p$-value as follows: 
+
+```{r}
+#| echo: false
+this_t <- -1.5
+```
+
+
+```{r}
+#| echo: true
+my_t <- -1.5
+pnorm(my_t) 
+```
+
+:::
+
+:::{.column column-width="40%"}
+
+```{r}
+#| fig-height: 3
+#| fig-width: 3
+#| fig-align: center
+#| out-width: "200%"
+norm_tail_plot(lower = this_t) + 
+  scale_x_continuous(breaks = c(this_t, 0), labels = c(0, expression("t*"))) + 
+  labs(x = "t", y = expression(f(t)~" given "~theta[0]), title = str_c("p = ", round(pnorm(this_t), 3)))
+```
+
+
+:::
+::::
+
+
+
+## Computing $p$-values (3)
+
+```{r}
+#| echo: false
+this_t <- 1.5
+```
+
+
+::::{.columns}
+:::{.column column-width="60%"}
+Suppose $t^* = 1.5$.
+
+We can compute asymptotically valid **upper one-tailed** $p$-value as follows: 
+
+```{r}
+#| echo: true
+my_t <- 1.5
+1 - pnorm(my_t) 
+```
+
+:::
+
+:::{.column column-width="40%"}
+
+```{r}
+#| fig-height: 3
+#| fig-width: 3
+#| fig-align: center
+#| out-width: "200%"
+norm_tail_plot(upper = this_t) + 
+  scale_x_continuous(breaks = c(0, this_t), labels = c(0, expression("t*"))) + 
+  labs(x = "t", y = expression(f(t)~" given "~theta[0]), title = str_c("p = ", round(1 - pnorm(this_t), 3)))
+```
+
+
+:::
+::::
+
+
+
+
+
+## Computing $p$-values (4)
+
+::::{.columns}
+:::{.column column-width="70%"}
+
+We can compute asymptotically valid **two-tailed** $p$-value as follows: 
+
+```{r}
+#| echo: true
+pnorm(-abs(my_t)) + 1 - pnorm(abs(my_t)) 
+2*(pnorm(-abs(my_t)))
+2*(1 - pnorm(abs(my_t)))
+```
+
+:::
+
+:::{.column column-width="30%"}
+
+```{r}
+#| fig-height: 3
+#| fig-width: 3
+#| fig-align: center
+#| out-width: "200%"
+norm_tail_plot(lower = -this_t, upper = this_t) + 
+  scale_x_continuous(breaks = c(-this_t, 0, this_t), labels = c(expression("-|t*|"), 0, expression("|t*|"))) + 
+  labs(x = "t", y = expression(f(t)~" given "~theta[0]), title = str_c("p = ", round(2*(1 - pnorm(this_t)), 3)))
+```
+
+
+:::
+::::
+
+
+
+## One-tailed vs two-tailed {.smaller}
+
+- **Lower one-tailed $p$-value** answers question, "How likely is it that I would get a value at least as *low* as $\hat{\theta}^*$ ($t^*$) if $\theta = \theta_0$?" [(similar for upper)]{.gray}
+- **Two-tailed $p$-value** answers question, "How likely is it that I would get a value at least as *extreme* as $\hat{\theta}^*$ ($t^*$) if $\theta = \theta_0$?"
+
+. . . 
+
+<br> 
+
+In principle, both interesting. One-tailed especially relevant if the null hypothesis is really that $\theta \geq \theta_0$.
+
+. . . 
+
+<br> 
+
+In practice, always use two-tailed because of the way $p$-values are used in testing
+
+
+## Null hypothesis significance testing (NHST)  {.smaller}
+
+Convention (credited to Fisher) is: "Reject null hypothesis if $p < .05$." When the null is true, rejection should occur 5% of the time. 
+
+. . . 
+
+Rejection of null hypothesis commonly interpreted [(by seminar audiences, reviewers, editors, hiring committees)]{.gray} as "finding something".
+
+. . .
+
+So researchers *really* want to reject null.
+
+. . .
+
+Much effort put into keeping researchers from cheating: 
+
+- taking into account multiple hypothesis tests [(problem set 2)]{.gray}
+- reducing researcher's ability to try many things [(pre-analysis plan)]{.gray}
+- requirements to share data and code [(replication archive)]{.gray}
+
+. . . 
+
+In this context, one-tailed p-values are seen as cheating.
+
+
+## Interpretation of p-values  {.smaller}
 
 A&M  (p. 128): "Intuitively, a low $p$-value means 'if the null hypothesis (that $\theta = \theta_0$) were true, we would infrequently encounter a result as extreme as the one that we saw. Therefore, if we *reject* the null hypothesis (that is, if we conclude that $\theta \neq \theta_0$) based solely on how extreme the result is, then that decision will be a mistake either infrequently (if $\theta = \theta_0$) or never (if $\theta \neq \theta_0$).'"
 
 . . .
 
+<br>
+
 So how often will it be a mistake? i.e. what is $\text{Pr}[\theta = \theta_0 \mid \text{reject}]$?
 
 . . . 
+
+<br>
 
 Based on above, sounds like our rejections are incorrect "between infrequently [($\alpha$)]{.gray} and never".
 
@@ -475,7 +804,7 @@ Based on above, sounds like our rejections are incorrect "between infrequently [
 
 What is $\text{Pr}[\theta = \theta_0 \mid \text{reject}]$ (probability a rejection is a mistake)?
 
-Use Bayes Rule: 
+Use Bayes Rule [(problem set 2)]{.gray}: 
 \begin{align}
 \text{Pr}[\theta = \theta_0 \mid \text{reject}] &= \frac{\text{Pr}[\text{reject}  \mid \theta = \theta_0 ] \text{Pr}[\theta = \theta_0]}{\text{Pr}[\text{reject}  \mid \theta = \theta_0 ] \text{Pr}[\theta = \theta_0] + \text{Pr}[\text{reject}  \mid \theta \neq \theta_0 ] \text{Pr}[\theta \neq \theta_0]} \\
 &= \frac{\alpha p_0}{ \alpha p_0 + \text{Power} (1 - p_0)}
@@ -495,16 +824,7 @@ Then
 
 
 
-## What is going on? 
-
-From A&M: "if we *reject* the null hypothesis...based solely on how extreme the result is, then **that decision** will be a mistake either *infrequently* (if $\theta = \theta_0$) or *never* (if $\theta \neq \theta_0$)"
-
-If "that decision" means "rejecting the null hypothesis", then "infrequently" is wrong: $$\text{Pr}[\text{rejection is mistake} \mid \theta = \theta_0] = 1$$
-
-If "that decision" means "rejecting only if the result is sufficiently extreme", then "never" is wrong: $$\text{Pr}[\text{fail to reject} \mid \theta \neq \theta_0] < 1$$
-
-
-## What is going on (2)? {.smaller}
+## What is going on (1)? {.smaller}
 
 Suppose 200 tests will be performed, and $\text{Pr}[\theta = \theta_0] = .5$.
 
@@ -524,6 +844,16 @@ Then only $5/85 \approx .056$ of the rejections were mistakes.
 
 Then $5/10 = .5$ of the rejections were mistakes.
 
+
+## What is going on (2)? 
+
+From A&M: "if we *reject* the null hypothesis...based solely on how extreme the result is, then **that decision** will be a mistake either *infrequently* (if $\theta = \theta_0$) or *never* (if $\theta \neq \theta_0$)"
+
+If "that decision" means "rejecting the null hypothesis", then "infrequently" is wrong: $$\text{Pr}[\text{rejection is mistake} \mid \theta = \theta_0] = 1$$
+
+If "that decision" means "rejecting only if the result is sufficiently extreme", then "never" is wrong: $$\text{Pr}[\text{fail to reject} \mid \theta \neq \theta_0] < 1$$
+
+
 ## More on interpreting $p$-values
 
 A&M (128): "Note that a high $p$-value does not offer the same guarantees for those looking to *accept* a null hypothesis and is accordingly limited in its utility for decision making."
@@ -540,8 +870,35 @@ Is this true? What do we learn from a high p-value?
 
 
 
-# The bootstrap
+# The bootstrap {background-image="assets/bootstraps.png" background-size="600px" background-position="right"}
+
+<!-- https://uselessetymology.com/2019/11/07/the-origins-of-the-phrase-pull-yourself-up-by-your-bootstraps/ --> 
+
+## Bootstrap motivation {.smaller}
+
+We know that plug-in estimators $\hat{\theta}$ are normally distributed [(under mild regularity conditions)]{.gray}.
+
+In many cases we can prove unbiasedness ($\E[\hat{\theta}] = \theta$) or consistency ($\hat{\theta} \rightarrow \theta$) [(e.g. sample variance)]{.gray}
+
+. . . 
+
+But what about the variance $\V[\hat{\theta}]$? [(necessary for CIs, $p$-values)]{.gray}
+
+We proved that $\V[\overline{X}] = \frac{\V[X]}{n}$, but what about for other estimators?
+
+. . . 
+
+The **bootstrap** is a very general solution.
 
 
+## Bootstrap basics
+
+$\V[\hat{\theta}]$ describes the variance of $\hat{\theta}$ across samples.
+
+**Problem:** We have only one sample.
+
+. . . 
+
+**Solution:** Artificially simulate repeated sampling by **resampling** from your sample *with replacement*.
 
 
