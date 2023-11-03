@@ -1,0 +1,103 @@
+---
+title: "Week 6: Lab Solutions"
+format: html
+editor: visual
+---
+
+## LaTeX Issues
+
+Example 1: \$V\[Y\] = \frac13 - \frac19 = \frac29 \$
+
+Example 2: $$
+COV[X,Y] = (1/2*((0-1/2)(0-1/3))+(1/6*((1-1/2)(0-1/3))+(1/3*((1-1/2)(1-1/3))
+\\  = (1/2*((-1/2)(-1/3))+(1/6*((1/2)(-1/3))+(1/3*((1/2)(2/3))
+\\  = (1/12)+(-1/36)+(1/9)
+\\ = 1/6
+$$
+
+## Problem Set Skills
+
+### Sketching out the Code
+
+*Suppose you have the following task: From the `iris` dataset, generate 100 samples each containing 50 observations. Calculate the mean of each sample and store the means together in one vector. Then calculate the mean of these sample means and generate a histogram for the same.*
+
+This is a big, computationally-challenging task. Try breaking this task down into smaller tasks. What is this task asking you to do?
+
+1.  
+
+### Coding: Sampling from a Dataset
+
+Look at the code below:
+
+```{r}
+new_samp <- sample(1:nrow(iris), size = 50, replace = TRUE)
+print(new_samp)
+```
+
+Is the output what you expected? What do you think the output is? What do we need to modify here to get closer to the desired output?
+
+Let's make those modifications.
+
+```{r}
+#new_samp <- iris[sample(1:nrow(iris), size = 50)]
+#print(new_samp)
+```
+
+What went wrong here? What did we specify about the sampling? What is still missing?
+
+```{r}
+new_samp <- iris[sample(1:nrow(iris), size = 50),]
+print(new_samp)
+```
+
+Now that we have the sampling working as intended, let's move on to the next step.
+
+1.  How many samples do you need?
+2.  You are performing the same task on all the samples. What programming tool should we use for such tasks?
+
+```{r}
+m<-100
+means_vec <- rep(NA, m)
+
+for (i in 1:m){
+  new_samp <- iris[sample(1:nrow(iris), size = 50),]
+  means_vec[i] <- mean(new_samp$Petal.Length)
+}
+print(means_vec)
+```
+
+Now, we just need to calculate and display the mean of the sample means.
+
+```{r}
+mean(means_vec)
+```
+
+```{r}
+hist(means_vec, breaks=30)
+```
+
+Suppose now that you have the same task as above, but now you need to calculate the sample means for only observations within the sample that are of species "setosa". Without making too many modifications to the code above, how can you incorporate that detail?
+
+```{r}
+m<-100
+means_vec <- rep(NA, m)
+
+for (i in 1:m){
+  new_samp <- iris[sample(1:nrow(iris), size = 50),]
+  means_vec[i] <- mean(new_samp$Petal.Length[new_samp$Species=="setosa"])
+}
+print(means_vec)
+```
+
+Look again at the entire dataset. Calculate the mean petal length for setosa flowers that have petals of width less that 0.5 units. What is this task asking you to do that the previous one wasn't?
+
+```{r}
+mean(iris$Petal.Length[iris$Species=="setosa"&iris$Petal.Width<0.5])
+```
+
+What do you notice about the change in value here? It unsurprisingly seems like there is a correlation between petal length and petal width. Regress the petal length on petal width and report **just** the regression coefficient.
+
+```{r}
+coef(lm(iris$Petal.Length~iris$Petal.Width))[2]
+
+```
