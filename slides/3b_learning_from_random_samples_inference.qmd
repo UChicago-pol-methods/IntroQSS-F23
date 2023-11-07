@@ -436,7 +436,9 @@ Basic idea:
 - specify a **null hypothesis** $\theta_0$: a possible value of $\theta$ [(typically one you're arguing against)]{.gray}
 - say how unlikely your result (or a more extreme one) would be if null hypothesis were true ($p$-value)
 
-The more unlikely your result $\hat{\theta}^*$ would be under the null hypothesis (i.e. the lower the $p$-value), the more doubtful the null hypothesis appears.
+. . .
+
+The more unlikely your result $\hat{\theta}^*$ would be *under the null* (i.e. the lower the $p$-value), the more doubtful the null hypothesis appears.
 
 
 ## The logic of hypothesis testing {.smaller}
@@ -450,16 +452,34 @@ Similar to **proof by contradiction** [(modus tollens)]{.gray}:
 
 But it's a **probabilistic version** [(weak syllogism)]{.gray}: 
 
-- "If $A$, then $B$ likely; but $B$ is false, so $A$ is less likely"
-- "If he loved me, then he *probably* would have called; he didn't call, so it's less likely that he loves me"
+- "If $A$, then $B$ likely; but $B$ is false, so $A$ becomes less likely"
+- "If he loved me, then he *probably* would have called; the fact that he didn't call makes me more doubtful that he loves me"
 
 . . . 
 
-"Less likely" is logically warranted: 
-$$\text{Pr}[\text{loves} \mid \text{no call}] < \text{Pr}[\text{loves} \mid \text{call}]$$
+The latter conclusion is logically warranted (by Bayes' rule) if $\text{Pr}(\text{no call} \mid \text{love}) < \text{Pr}(\text{no call} \mid \text{no love})$.  
 
-"Unlikely" (e.g. $\text{Pr}[\text{loves} \mid \text{no call}] < .5$) is not.
+. . . 
 
+But the conclusion that "he probably doesn't love me" is not -- it depends on how confident you were of his love before.
+
+## Bayes rule, again {.smaller}
+
+We have: 
+
+\begin{align} 
+\text{Pr}[\text{love} \mid \text{no call}] &= \frac{\text{Pr}[\text{no call} \mid \text{love}] \text{Pr}[\text{love}]}{\text{Pr}[\text{no call}]}\\ 
+\text{Pr}[\text{no love} \mid \text{no call}] &= \frac{\text{Pr}[\text{no call} \mid \text{no love}] \text{Pr}[\text{no love}]}{\text{Pr}[\text{no call}]}
+\end{align}
+
+. . . 
+
+The ratio between them: 
+
+
+$$\overbrace{\frac{\text{Pr}[\text{love} \mid \text{no call}]}{\text{Pr}[\text{no love} \mid \text{no call}]}}^{\text{Posterior odds}} = \overbrace{\frac{ \text{Pr}[\text{no call} \mid \text{love}] }{\text{Pr}[\text{no call} \mid \text{no love}] }}^{\text{Likelihood ratio}} \overbrace{\frac{\text{Pr}[\text{love}]}{\text{Pr}[\text{no love}]}}^{\text{Prior odds}}$$ 
+
+Posterior odds lower than prior odds $\iff$ likelihood ratio $< 1$. 
 
 ## $p$-value logic (1)
 
@@ -501,7 +521,7 @@ norm_tail_plot() +
 
 But we can say, "Suppose $\theta = \theta_0$".
 
-Then* we know that
+In that case, we know that*
 
 $$\hat{\theta} \sim N(\theta_0, \hat{\sigma}^2)$$
 and we can estimate the probability that $\hat{\theta}$ would be in any interval, given $\theta_0$. 
@@ -590,7 +610,7 @@ norm_tail_plot(upper = c(1.2)) +
 
 ## The two-tailed $p$-value
 
-Two-tailed p-value: $\text{Pr}\left[|\hat{\theta} - \theta_0| \geq |\hat{\theta}^* - \theta_0| \mid \theta = \theta_0\right]$
+Two-tailed p-value: $\text{Pr}\left[\lvert\hat{\theta} - \theta_0\rvert \geq \lvert\hat{\theta}^* - \theta_0\rvert \bigm| \theta = \theta_0\right]$
 
 ```{r}
 #| fig-width: 4
@@ -654,7 +674,7 @@ pnorm(my_t)
 #| fig-align: center
 #| out-width: "200%"
 norm_tail_plot(lower = this_t) + 
-  scale_x_continuous(breaks = c(this_t, 0), labels = c(0, expression("t*"))) + 
+  scale_x_continuous(breaks = c(this_t, 0), labels = c(expression("t*"), 0)) + 
   labs(x = "t", y = expression(f(t)~" given "~theta[0]), title = str_c("p = ", round(pnorm(this_t), 3)))
 ```
 
@@ -772,11 +792,11 @@ So researchers *really* want to reject null.
 
 . . .
 
-Much effort put into keeping researchers from cheating: 
+Many "best practices" are about minimizing cheating: 
 
-- taking into account multiple hypothesis tests [(problem set 2)]{.gray}
-- reducing researcher's ability to try many things [(pre-analysis plan)]{.gray}
-- requirements to share data and code [(replication archive)]{.gray}
+- corrections for multiple hypothesis tests [(problem set 2)]{.gray}
+- pre-analysis plans that specify how analysis will be run
+- requirement to share data and code [(replication archive)]{.gray}
 
 . . . 
 
@@ -785,7 +805,7 @@ In this context, one-tailed p-values are seen as cheating.
 
 ## Interpretation of p-values  {.smaller}
 
-A&M  (p. 128): "Intuitively, a low $p$-value means 'if the null hypothesis (that $\theta = \theta_0$) were true, we would infrequently encounter a result as extreme as the one that we saw. Therefore, if we *reject* the null hypothesis (that is, if we conclude that $\theta \neq \theta_0$) based solely on how extreme the result is, then that decision will be a mistake either infrequently (if $\theta = \theta_0$) or never (if $\theta \neq \theta_0$).'"
+> Intuitively, a low $p$-value means "if the null hypothesis (that $\theta = \theta_0$) were true, we would infrequently encounter a result as extreme as the one that we saw. Therefore, if we *reject* the null hypothesis (that is, if we conclude that $\theta \neq \theta_0$) based solely on how extreme the result is, then that decision will be a mistake either infrequently (if $\theta = \theta_0$) or never (if $\theta \neq \theta_0$)." (Aronow & Miler, p. 128)
 
 . . .
 
@@ -804,7 +824,7 @@ Based on above, sounds like our rejections are incorrect "between infrequently [
 
 What is $\text{Pr}[\theta = \theta_0 \mid \text{reject}]$ (probability a rejection is a mistake)?
 
-Use Bayes Rule [(problem set 2)]{.gray}: 
+Use Bayes' Rule [(problem set 2)]{.gray}: 
 \begin{align}
 \text{Pr}[\theta = \theta_0 \mid \text{reject}] &= \frac{\text{Pr}[\text{reject}  \mid \theta = \theta_0 ] \text{Pr}[\theta = \theta_0]}{\text{Pr}[\text{reject}  \mid \theta = \theta_0 ] \text{Pr}[\theta = \theta_0] + \text{Pr}[\text{reject}  \mid \theta \neq \theta_0 ] \text{Pr}[\theta \neq \theta_0]} \\
 &= \frac{\alpha p_0}{ \alpha p_0 + \text{Power} (1 - p_0)}
@@ -837,6 +857,8 @@ Then only $5/85 \approx .056$ of the rejections were mistakes.
 
 . . . 
 
+<br>
+
 **Bad situation** (power = .05):
 
 - 100 cases where $\theta = \theta_0$, with 5 rejections.
@@ -845,28 +867,47 @@ Then only $5/85 \approx .056$ of the rejections were mistakes.
 Then $5/10 = .5$ of the rejections were mistakes.
 
 
-## What is going on (2)? 
+## What is going on (2)?  {.smaller}
 
-From A&M: "if we *reject* the null hypothesis...based solely on how extreme the result is, then **that decision** will be a mistake either *infrequently* (if $\theta = \theta_0$) or *never* (if $\theta \neq \theta_0$)"
+> Intuitively, ... "if we *reject* the null hypothesis...based solely on how extreme the result is, then **that decision** will be a mistake either *infrequently* (if $\theta = \theta_0$) or *never* (if $\theta \neq \theta_0$)." (Aronow & Miler, p. 128; emphasis added)
+
+<br>
+
+. . . 
 
 If "that decision" means "rejecting the null hypothesis", then "infrequently" is wrong: $$\text{Pr}[\text{rejection is mistake} \mid \theta = \theta_0] = 1$$
+
+<br> 
+
+. . . 
 
 If "that decision" means "rejecting only if the result is sufficiently extreme", then "never" is wrong: $$\text{Pr}[\text{fail to reject} \mid \theta \neq \theta_0] < 1$$
 
 
-## More on interpreting $p$-values
+## More on interpreting $p$-values {.smaller}
 
-A&M (128): "Note that a high $p$-value does not offer the same guarantees for those looking to *accept* a null hypothesis and is accordingly limited in its utility for decision making."
+> Note that a high $p$-value does not offer the same guarantees for those looking to *accept* a null hypothesis and is accordingly limited in its utility for decision making. (Aronow & Miller, p. 128)
 
-Is this true? What do we learn from a high p-value? 
+Is this true? What do we learn from a high $p$-value? 
 
+. . . 
 
+Again Bayes' Rule says it depends on the likelihood ratio: 
+
+\begin{align} \frac{\text{Pr}[ \theta = \theta_0 \mid \text{high p-value}]}{\text{Pr}[ \theta = \theta_1 \mid \text{high p-value}]} &= \frac{\frac{\text{Pr}[ \text{high p-value} \mid \theta = \theta_0 ] \text{Pr}[ \theta = \theta_0 ]}{\text{Pr}[ \text{high p-value}]}}{\frac{\text{Pr}[ \text{high p-value} \mid \theta = \theta_1 ] \text{Pr}[ \theta = \theta_1 ]}{\text{Pr}[ \text{high p-value}]}}  \\ 
+&= \frac{\text{Pr}[ \text{high p-value} \mid \theta = \theta_0 ]}{\text{Pr}[ \text{high p-value} \mid \theta = \theta_1 ]} \frac{\text{Pr}[ \theta = \theta_0 ]}{\text{Pr}[ \theta = \theta_1 ]}
+\end{align}
+
+. . . 
+
+If a high $p$-value is much more likely under the null than when $\theta = \theta_1$, then $\theta_0$ may become much more plausible compared to $\theta_1$.      
 
 ## Interpreting p-values: conclusion
 
 - interpreting $p$-values is hard
-- lower $p$-value casts more doubt on null
-- saying more (e.g. about share of rejections that are wrong) usually requires information on (i) prior probability that null is true and (ii) power of test 
+- lower $p$-value casts more doubt on null hypothesis
+- saying more (e.g. about share of rejections that are wrong, probability null is true) requires more information
+- use Bayes' rule
 
 
 
@@ -882,23 +923,329 @@ In many cases we can prove unbiasedness ($\E[\hat{\theta}] = \theta$) or consist
 
 . . . 
 
+<br>
+
 But what about the variance $\V[\hat{\theta}]$? [(necessary for CIs, $p$-values)]{.gray}
 
-We proved that $\V[\overline{X}] = \frac{\V[X]}{n}$, but what about for other estimators?
+We proved that $\V[\overline{X}] = \frac{\V[X]}{n}$ given iid samples, but what about 
+
+- other estimators?
+- non iid samples?
+
+**Example:** correlation between two variables, ratio of two means 
 
 . . . 
 
-The **bootstrap** is a very general solution.
+<br>
+
+The **bootstrap** is a very general solution for estimating $\V[\hat{\theta}]$.
 
 
 ## Bootstrap basics
 
-$\V[\hat{\theta}]$ describes the variance of $\hat{\theta}$ across samples.
+$\V[\hat{\theta}]$ describes the variance of $\hat{\theta}$ across samples of size $n$.
 
-**Problem:** We have only one sample.
+**Problem:** We have only one sample of size $n$.
 
 . . . 
 
-**Solution:** Artificially simulate repeated sampling by **resampling** from your sample *with replacement*.
+**Bootstrap solution:** 
+
+- Generate $m$ artificial samples of size $n$ by **resampling** from our sample *with replacement*
+- Estimate $\V[\hat{\theta}]$ using the variance of $\hat{\theta}$ across these artificial samples
+
+
+## Bootstrap illustration
+
+```{r}
+#| echo: true
+samp <- c(4,2,5,3,6,6)
+mean(samp)
+(resamp1 <- sample(samp, size = length(samp), replace = T))
+mean(resamp1)
+(resamp2 <- sample(samp, size = length(samp), replace = T))
+mean(resamp2)
+(resamp3 <- sample(samp, size = length(samp), replace = T))
+mean(resamp3)
+```
+
+## Why does this work? {.smaller}
+
+The bootstrap is a **plug-in estimator**!
+
+- The estimand is now $\V[\hat{\theta}]$, the sampling variance
+- If we had the population, we could compute $\V[\hat{\theta}]$ by resampling from population
+- We don't have the population, so we "plug in" the sample and resample from that
+- As $n$ increases, the sample looks more like the population, so the bootstrap estimate of $\V[\hat{\theta}]$ gets closer to the estimand
+
+. . . 
+
+Compare to our approach to estimating $\V[\overline{X}]$ previously: 
+
+- Analytically determine that $\V[\overline{X}] = \frac{\V[X]}{n}$
+- Use plug-in principle to estimate $\V[X]$: compute `var()` in sample instead of population
+
+. . . 
+
+We don't need bootstrap for $V[\overline{X}]$, but it will work for (almost) *anything*.
+
+
+## Bootstrap example {.smaller}
+
+Let's get a 90% confidence interval for the mean of `env` (jobs/environment tradeoff) in 2012 CCES.
+
+```{r}
+#| output: false
+#| echo: true
+dat <- read.csv("./../data/cces_2012_subset.csv")
+```
+
+. . . 
+
+Earlier, we learned this approach to estimating $\sigma[\overline{X}]$: 
+
+```{r}
+#| echo: true
+std_error <- sqrt(var(dat$env, na.rm = T)/sum(!is.na(dat$env)))
+std_error
+```
+
+This also works:
+```{r}
+#| echo: true
+env <- dat$env[!is.na(dat$env)]
+sd(env)/sqrt(length(env))
+```
+
+
+. . . 
+
+The bootstrap approach: 
+
+- resample $n$ rows with replacement from `dat` $m$ times
+- compute $m$ sample means
+- compute standard deviation across them
+
+
+## Bootstrap example (2)
+
+```{r}
+m <- 1000
+samp_means <- rep(NA, times = m)
+for(i in 1:m){
+  resamp_dat <- dat[sample(1:nrow(dat), size = nrow(dat), replace = T),]
+  samp_means[i] <- mean(resamp_dat$env, na.rm = T)
+}
+```
+
+I stored $m=1000$ sample means in `samp_means`. 
+
+```{r}
+#| echo: true
+(bootstrap_std_error <- sd(samp_means))
+```
+
+Very close to other solution! 
+
+. . . 
+
+Now for the 90% confidence intervals: 
+
+```{r}
+#| echo: true
+# using "analytical" approach (V[X]/n)
+mean(dat$env, na.rm = T) + 1.96*std_error*c(-1, 1)
+# using bootstrap
+mean(dat$env, na.rm = T) + 1.96*bootstrap_std_error*c(-1, 1)
+```
+
+
+## Using the bootstrap
+
+**Our estimand** $\theta$: correlation between `env` and `aa` in 2012 CCES [(CCES is population)]{.gray}
+
+. . . 
+
+**Our estimator** $\hat{\theta}$: correlation in a sample of $n$ rows
+
+. . . 
+
+**Variance of our estimator** $\V[\hat{\theta}]$: 
+
+- True value can be approximated by repeated samples from population
+- How to estimate from sample:
+    - Analytical solution (analogous to $\V[X]/n$ for sample mean)?
+    - Bootstrap!
+
+
+## Application of bootstrap (2) {.smaller}
+
+```{r}
+# repeated samples to get truth
+m <- 5000
+n <- 500
+corrs_repeat_samp <- rep(NA, m)
+for(i in 1:m){
+  samp <- dat[sample(1:nrow(dat), size = n, replace = F),]
+  corrs_repeat_samp[i] <- cor(samp$env, samp$aa, use = "complete.obs")   
+}
+```
+
+```{r}
+# our sample
+samp <- dat[sample(1:nrow(dat), size = n, replace = F),]
+# resampling 
+corrs_resamp <- rep(NA, m)
+for(i in 1:m){
+  resamp <- samp[sample(1:nrow(samp), size = n, replace = T),]
+  corrs_resamp[i] <- cor(resamp$env, resamp$aa, use = "complete.obs")   
+}
+```
+
+1. *Repeated samples from population*: draw 5000 samples of size **500** from full CCES; compute `cor(env, aa)` in each one
+2. *Repeated resamples from sample*: start with sample of size **500** from CCES; draw 5000 resamples; compute `cor(env, aa)` in each one  
+
+. . . 
+
+```{r}
+#| fig-width: 5
+#| fig-height: 2.7
+#| out-width: "80%"
+#| fig-align: center
+
+bind_rows(tibble(type = str_c("1. Repeated samples from population\nStd. dev: ", round(sd(corrs_repeat_samp), 4)),
+                 corrs = corrs_repeat_samp),
+          tibble(type = str_c("2. Repeated resamples from sample\nStd. dev: ", round(sd(corrs_resamp), 4)),
+                 corrs = corrs_resamp)) |> 
+  ggplot(aes(x = corrs)) + 
+  geom_histogram() + 
+  facet_wrap(vars(type)) + 
+  labs(x = "Correlation between env and aa", y = "Count") + 
+  theme_bw()
+```
+
+
+
+
+## Application of bootstrap (2) {.smaller}
+
+```{r}
+# repeated samples to get truth
+n <- 1500
+corrs_repeat_samp <- rep(NA, m)
+for(i in 1:m){
+  samp <- dat[sample(1:nrow(dat), size = n, replace = F),]
+  corrs_repeat_samp[i] <- cor(samp$env, samp$aa, use = "complete.obs")   
+}
+```
+
+```{r}
+# our sample
+samp <- dat[sample(1:nrow(dat), size = n, replace = F),]
+# resampling 
+corrs_resamp <- rep(NA, m)
+for(i in 1:m){
+  resamp <- samp[sample(1:nrow(samp), size = n, replace = T),]
+  corrs_resamp[i] <- cor(resamp$env, resamp$aa, use = "complete.obs")   
+}
+```
+
+1. *Repeated samples from population*: draw 5000 samples of size **1500** from full CCES; compute `cor(env, aa)` in each one
+2. *Repeated resamples from sample*: start with sample of size **1500** from CCES; draw 5000 resamples; compute `cor(env, aa)` in each one  
+
+. . . 
+
+```{r}
+#| fig-width: 5
+#| fig-height: 2.7
+#| out-width: "80%"
+#| fig-align: center
+
+bind_rows(tibble(type = str_c("1. Repeated samples from population\nStd. dev: ", round(sd(corrs_repeat_samp), 4)),
+                 corrs = corrs_repeat_samp),
+          tibble(type = str_c("2. Repeated resamples from sample\nStd. dev: ", round(sd(corrs_resamp), 4)),
+                 corrs = corrs_resamp)) |> 
+  ggplot(aes(x = corrs)) + 
+  geom_histogram() + 
+  facet_wrap(vars(type)) + 
+  labs(x = "Correlation between env and aa", y = "Count") + 
+  theme_bw()
+```
+
+
+
+## Varieties of bootstrap {.smaller}
+
+**Naive bootstrap**: Resample rows of the dataset with replacement (i.e. the method above).
+
+. . . 
+
+**Block bootstrap**: For grouped data (e.g. students in schools), resample groups rather than dataset rows
+
+. . . 
+
+**Bayesian bootstrap**: Keep rows of dataset same but draw random **reweightings**
+
+. . . 
+
+**Residual bootstrap**: Keep rows of dataset same but resample *residuals*, i.e.
+
+- Fit a model for $Y$
+- Compute *fitted value* $\hat{y}_i$ and *residual* $\hat{e}_i$ for each observation, where $y_i = \hat{y}_i + \hat{e}_i$
+- Resample residuals with replacement, so $y_i$ becomes $\hat{y}_i + \hat{e}_j$
+
+. . .
+
+**Wild bootstrap** (unrestricted): Keep rows of dataset same but *rescale residuals*, e.g. by draws from $\{-1, 1\}$ [(equal probability)]{.gray} or $N(0, 1)$
+
+ <!-- Rademacher distribution --> 
+
+
+
+# Randomization inference
+
+## Motivation {.smaller}
+
+So far, we have focused on uncertainty that comes from *sampling from a population*: we don't know about the units not in the sample.
+
+- **Target of inference**: Population quantity [(e.g. population average, regression coefficient)]{.gray}
+- **Source of uncertainty**: Missing rows
+
+. . . 
+
+<br> 
+
+In causal inference, we also care about uncertainty that comes from the *assignment of treatment*: we don't know some of the *potential outcomes*, i.e. outcomes for a given unit if it had each treatment
+
+- **Target of inference**: Sample quantity [(e.g. sample average treatment effect)]{.gray}
+- **Source of uncertainty**: Missing data [(missing potential outcomes)]{.gray}
+
+
+## Randomization inference: procedure {.smaller}
+
+**Sharp null hypothesis** is that treatment does not affect outcomes.
+
+. . . 
+
+Under sharp null, we **do** know the missing potential outcomes: they are the same as observed potential outcomes.
+
+. . . 
+
+So:
+
+- randomly reshuffle the treatment
+- compute treatment effect under sharp null
+- store and repeat
+
+. . . 
+
+Get a $p$-value by comparing observed treatment effect to distribution of treatment effects under sharp null.
+
+<!-- consider example with taylor swift -->     <!-- okay now maybe write problem set for next week, while it's fresh in my head? --> 
+
+
+<!-- put p-value in? or that's for the problem set? --> 
+
+<!-- percentile method for bootstrap approach --> 
 
 
