@@ -1,0 +1,1128 @@
+---
+title: "PLSC30500, Fall 2023"
+subtitle: "Part 4. Regression (part a)"
+author: "Andy Eggers"
+format: 
+  revealjs:
+    smaller: false
+    slide-number: c/t
+    css: ["default", "uchicago_pol_meth.css"]
+    theme: simple
+    echo: false
+    embed-resources: true
+---
+
+
+```{r}
+#| warning: false
+#| message: false
+
+library(tidyverse)
+knitr::opts_chunk$set(dev = "ragg_png")
+```
+
+## Regression motivation {.smaller}
+
+It's great if your estimator is as simple as a sample mean $\overline{X}$ or a difference in sample means $\overline{Y}_1 - \overline{Y}_0$. 
+
+. . . 
+
+But $>95%$ of the time researchers in social science use **OLS regression**:
+
+- predict $Y$ using many predictors $X_{[1]}, X_{[2]}, \ldots$
+- relationship between $Y$ and $X_{[1]}$ *controlling for* or *adjusting for* other variables
+- or just a difference in sample means! $\overline{Y}_1 - \overline{Y}_0$
+
+. . . 
+
+To understand it we'll use (almost) everything we have learned.
+
+
+
+# Regression theory 
+
+## BLP with one predictor {.smaller}
+
+\def\E{{\textrm E}\,}
+\def\V{{\textrm V}\,}
+\def\bm{\boldsymbol}
+
+
+- CEF (conditional expectation function): $E[Y \mid X]$. Could be any shape.
+- BLP (best linear predictor): MSE-minimizing slope and intercept, i.e.
+$$(\alpha, \beta) = \underset{(a,b) \in \mathbb{R}^2}{\arg\min} \, \mathrm{E}\,[\left(Y - (a + bX)\right)^2]$$
+
+. . . 
+
+  - Can be viewed as BLP of $Y$ or BLP of CEF ($E[Y \mid X]$)
+  - **Solution**: $\beta = \frac{\text{Cov}[X, Y]}{\V[X]}$, $\alpha = \E[Y] - \beta \E[X]$
+  
+. . . 
+
+**Plug-in estimator**: to get $\hat{\alpha}$, $\hat{\beta}$, plug in sample covariance, sample variance, sample means to solution above 
+
+
+
+## Errors and residuals 
+
+Given a prediction $\hat{Y}_i$ for an observation $i$, the **residual** is 
+
+$$e_i = Y_i - \hat{Y}_i$$ 
+
+. . . 
+
+If the prediction $\hat{Y}_i$ is based on a true population predictor (e.g. CEF or BLP), then $e_i = Y_i - \hat{Y}$ can be called an **error**.
+
+<br> 
+
+(Residual : error :: Sample mean $\overline{X}$ : expectation $\E[X]$) 
+
+
+
+## BLP with multiple predictors {.smaller}
+
+- CEF (conditional expectation function): $E[Y \mid \mathbf{X}]$. Could be any shape.
+- BLP (best linear predictor): MSE-minimizing vector of coefficients, i.e. 
+$$(\beta_0, \beta_1, \ldots, \beta_K) = \underset{(b_0, b_1, \ldots, b_K) \in \mathbb{R}^{K+1}}{\arg\min} \, \mathrm{E}\,[\left(Y - (b_0 + b_1X_{[1]} + \ldots + b_K X_{[K]})\right)^2]$$
+
+. . . 
+
+  - Can be viewed as BLP of $Y$ or BLP of CEF ($E[Y \mid X]$)
+  - **Solution**: no simpler statement than the problem above 
+
+. . . 
+
+**Plug-in estimator** (Ordinary Least Squares, OLS):
+
+$$(\hat{\beta_0}, \hat{\beta_1}, \ldots, \hat{\beta_K}) = \underset{(b_0, b_1, \ldots, b_K) \in \mathbb{R}^{K+1}}{\arg\min} \, \frac{1}{n}\sum_{i =1}^n\, \left(Y - (b_0 + b_1X_{[1]} + \ldots + b_K X_{[K]})\right)^2,$$
+i.e. choose coefficients to minimize the mean of the squared residuals in the sample <!-- [(equivalently, sum of squared residuals)]{.gray} --> 
+
+## How do we solve this problem? {.smaller}
+
+Our problem is
+$$(\hat{\beta_0}, \hat{\beta_1}, \ldots, \hat{\beta_K}) = \underset{(b_0, b_1, \ldots, b_K) \in \mathbb{R}^{K+1}}{\arg\min} \, \frac{1}{n}\sum_{i =1}^n\,\left(Y - (b_0 + b_1X_{[1]} + \ldots + b_K X_{[K]})\right)^2,$$
+
+. . . 
+
+We could try all possible vectors of coefficients to find $(\hat{\beta_0}, \hat{\beta_1}, \ldots, \hat{\beta_K})$.
+
+. . . 
+
+The solution (via linear algebra and calculus) is 
+$$\hat{\boldsymbol{\beta}} = \left( \mathbb{X}^T \mathbb{X} \right)^{-1} \mathbb{X}^T \mathbf{Y}$$
+
+where $\mathbb{X}$ is an $n \times K$ matrix of predictors and $\mathbf{Y}$ is an $n \times 1$ column vector (the dependent variable). 
+
+We'll discuss more.
+
+. . . 
+
+For we use `lm()` or `estimatr::lm_robust()` in `R`. 
+
+
+## BLP as "modest" justification for OLS 
+
+There is a CEF but we're not claiming to be able to find it. [(cf Gauss-Markov theorem)]{.gray}
+
+. . . 
+
+Instead, trying to estimate a BLP, whose form **we choose** by deciding what $X_{[1]}, X_{[2]}, \ldots, X_{[K]}$ are [(what variables, what transformations, what interactions)]{.gray}.
+
+. . . 
+
+The BLP is the "best" approximation to $Y$ and the CEF *given the chosen predictors*, and OLS is a consistent estimator of it, but the BLP might not be helpful!
+
+. . .
+
+<br>
+
+So how do we choose a BLP, i.e. a *specification*?
+
+
+## What a BLP can be good for  {.smaller}
+
+Say we are predicting infant mortality $Y$ using water quality and access to electricity [(Aronow and Miller)]{.gray}.
+
+. . . 
+
+<br>
+
+Why estimate this BLP?
+
+- It might provide a useful *description* of relationships, i.e. a summary of how these things vary across countries
+- It might be a useful *predictive tool* (e.g. likely infant mortality in regions where we have data on water quality and electrification)
+- It might inform us about (causal) **effect**, i.e. likely change in infant mortaility if we changed water quality or access to electricity
+
+
+## Don't be fooled by the L in BLP {.smaller}
+
+In the simple case with continuous $X$ and $Y$, our BLP was a line: $\alpha + \beta X$.
+
+. . . 
+
+The BLP is **linear** in the sense that it is the weighted sum of components $X_{[1]}, X_{[2]}, \ldots, X_{[K]}$: 
+
+$$\beta_0 + \beta_1 X_{[1]} + \beta_2 X_{[2]} + \ldots + \beta_K X_{[K]}$$
+
+. . .
+
+But the BLP does not need to be a linear function of any particular variable, e.g. GDPPC or education. For example: 
+
+- **polynomials**: $X_{[1]}$ could be $\text{GDPPC}$, $X_{[2]}$ could be $\text{GDPPC}^2$
+- **binning**: $X_{[1]}$ could be 1 if $\text{GDPPC} \in [1000, 2000)$ and otherwise 0, $X_{[2]}$ could be 1 if $\text{GDPPC} \in [2000, 3000)$ and otherwise 0, etc
+- **interactions**: $X_{[1]}$ could be $\text{GDPPC}$, $X_{[2]}$ could be $\text{area}$, $X_{[3]}$ could be $\text{GDPPC} \times \text{area}$
+
+
+
+
+# Polynomials and overfitting
+
+## A dataset  {.smaller}
+
+
+Here is a dataset on U.S. presidential elections from 1948 to 2016: 
+
+```{r}
+pres <- read_csv("./../data/pres_data.csv") %>% 
+  filter(year < 2020)
+```
+
+| Variable Name | Description | 
+|-------:|:-----------------------:|
+|`year` | Election year |
+| `deminc` | 1=incumbent is a Democrat |
+| `incvote` | Percent of the two-party vote for the incumbent party |
+|`q2gdp` | Second-quarter change in real GDP in election year |
+| `juneapp` | Net approval of incumbent president in June of election year |
+
+
+## Incumbent approval rating and incumbent party vote share 
+
+```{r}
+#| fig-height: 4
+#| fig-width: 5.5
+#| out-width: "80%"
+#| fig-align: center
+vote_app <- pres |>  
+  ggplot(aes(x = juneapp, y = incvote, label = year)) + 
+  geom_point() + 
+  ggrepel::geom_text_repel(size = 2) 
+vote_app
+```
+
+
+## OLS regression {.smaller}
+
+::::{.columns}
+:::{.column column-width="60%"}
+
+```{r}
+#| fig-height: 3.5
+#| fig-width: 5
+#| out-width: "90%"
+#| fig-align: center
+vote_app + 
+  geom_smooth(method = lm, se = F)
+```
+
+:::
+
+:::{.column column-width="40%"}
+
+```{r}
+lm(incvote ~ juneapp, 
+   data = pres)
+```
+
+:::
+
+::::
+
+Avoid causal language in describing the coefficient on `juneapp`, e.g.
+
+> "One percentage point higher presidential approval in June is associated with .16 percentage points higher vote share for the president's party in the November election"
+
+
+## Adding polynomials three ways (1)
+
+```{r}
+#| echo: true
+# add variables to data
+# base R version
+pres2 <- pres
+pres2$juneapp_squared <- pres2$juneapp^2
+pres2$juneapp_cubed <- pres2$juneapp^3
+```
+
+. . . 
+
+```{r}
+#| echo: true
+# tidy version
+pres2 <- pres |> 
+  mutate(juneapp_squared = juneapp^2,
+         juneapp_cubed = juneapp^3)
+```
+
+. . . 
+
+```{r}
+#| echo: true
+# regression
+lm(incvote ~ juneapp + juneapp_squared + juneapp_cubed, data = pres2)
+```
+
+
+## Adding polynomials three ways (2)
+
+```{r}
+#| echo: true
+# add variables to formula using I()
+lm(incvote ~ juneapp + I(juneapp^2) + I(juneapp^3), data = pres)
+```
+
+
+## Adding polynomials three ways (3)
+
+```{r}
+#| echo: true
+# poly() function
+lm(incvote ~ poly(juneapp, degree = 3, raw = T), data = pres)
+```
+
+
+## Plotting polynomial relationships
+
+```{r}
+#| echo: true
+pres |>  
+  ggplot(aes(x = juneapp, y = incvote)) + 
+  geom_point() + 
+  geom_smooth(method = "lm", se = F)
+```
+
+
+## Plotting polynomial relationships
+
+```{r `code-line-numbers`="4-5"}
+#| echo: true 
+pres |>  
+  ggplot(aes(x = juneapp, y = incvote)) + 
+  geom_point() + 
+  geom_smooth(method = "lm", se = F,  
+              formula = y ~ poly(x, 3)) 
+```
+
+
+
+## Plotting polynomial relationships
+
+```{r `code-line-numbers`="5"}
+#| echo: true
+#| fig-align: center
+pres |>  
+  ggplot(aes(x = juneapp, y = incvote)) + 
+  geom_point() + 
+  geom_smooth(method = "lm", se = F,
+              formula = y ~ poly(x, 12)) +
+  coord_cartesian(ylim = c(40, 70))
+```
+
+
+## Overfitting {.smaller}
+
+As you add more polynomials [(more generally, add predictors to the model)]{.gray}, you reduce the mean squared *residual* (MSE) in the sample. But you may be increasing mean squared residual (MSE) in the **population** due to **overfitting**.
+
+. . . 
+
+Suppose the dots below are the population, and the red line is the CEF:
+
+```{r}
+n <- 1000
+dat_xy <- tibble(x = runif(n, min = 0, max = 2.75)) |> 
+  mutate(mu = 3*x + 8*x^2 - 3*x^3,
+         y = rnorm(n, mean = mu, sd = 3))
+
+dat <- dat_xy |> 
+  mutate(blp = predict(lm(y ~ poly(x, 3), data = dat_xy)))
+
+p <- dat |> 
+  ggplot(aes(x = x, y = y)) + 
+  geom_point(alpha = .5, size = 2) +
+  theme_bw() + 
+  geom_line(aes(y = blp), col = "red", lwd = 2)
+```
+
+
+```{r}
+#| fig-height: 3.5
+#| fig-width: 7
+#| fig-align: center
+#| out-width: "85%"
+p
+```
+
+
+## Overfitting (2) {.smaller}
+
+We will take samples of size $n$ from the population (size $N$) and estimate the BLP with different orders of polynomial $k$:
+
+$$Y_i = \beta_0 + \beta_1 X_i + \beta_2 X_i^2 + \ldots + \beta_k X_i^k $$
+
+. . . 
+
+As we increase $k$, what will happen to  mean squared residual in **sample** [(i.e. $\frac{1}{n} \sum (Y_i - \hat{Y}_i)^2$)]{.gray} vs in **population** [(i.e. $\frac{1}{N} \sum (Y_i - \hat{Y}_i)^2$)]{.gray}?
+
+```{r functions, echo = F}
+draw_dat <- function(n = 15){
+  dat_xy |> slice_sample(n = n)
+  #tibble(x = runif(n, min = 0, max = 2.75)) |> 
+  #  mutate(mu = 3*x + 8*x^2 - 3*x^3, y = rnorm(n, mean = mu, sd = 3))
+}
+
+get_mse <- function(dat, mod){
+  dat |> 
+    mutate(resid = dat$y - predict(mod, newdata = dat)) |> 
+    summarize(mean(resid^2)) |> 
+    as.numeric()  
+}
+```
+
+
+```{r, echo = F}
+#cef_dat <- tibble(x = seq(0, 2.75, by = .01)) |> 
+#  mutate(mu = 3*x + 8*x^2 - 3*x^3)
+
+plot_dat <- draw_dat(n = 25)
+
+base_plot <- plot_dat |> 
+  ggplot(aes(x = x, y = y)) + 
+  geom_point() +
+  geom_line(data = dat, aes(y = blp), col = "red", lwd = 2) + 
+  geom_text(x = 0, y = -2, col = "red", label = "CEF") + 
+  coord_cartesian(ylim = c(-5, 20))
+```
+
+
+:::: {.columns}
+
+::: {.column column-width="50%"}
+```{r, echo = F, fig.height = 5}
+#| fig-width: 4.5
+#| fig-height: 3
+#| fig-align: center
+#| out-width: "90%" 
+base_plot +
+  geom_smooth(method = "lm", se = F) + 
+  labs(title = "Linear fit in sample (polynomial order = 1)")
+```
+
+:::
+
+::: {.column column-width="50%"}
+```{r}
+#| fig-width: 4.5
+#| fig-height: 3
+#| fig-align: center
+#| out-width: "90%" 
+base_plot +
+  geom_smooth(method = "lm", se = F, formula = y ~ poly(x, 3)) +
+  labs(title = "Cubic fit in sample (polynomial order = 3)")
+```
+:::
+::::
+
+
+
+## Overfitting (3)
+
+
+```{r, echo = F, cache = T}
+#big_dat <- draw_dat(n = 15000)
+mod <- lm(y ~ x, data = dat)
+results <- expand_grid(k = c(1, 2, 3, 4, 5),
+            rep = 1:200,
+            n = c(15, 50, 100, 500)) |> 
+  mutate(data = map(n, draw_dat),
+         mod = map2(k, data, ~ lm(y ~ poly(x, .x), data = .y)),
+         mse_in_sample = map2_dbl(data, mod, get_mse),
+         mse_out_of_sample = map_dbl(mod, get_mse, dat = dat_xy)) 
+```
+
+```{r, echo = F}
+#| fig-height: 5
+#| fig-width: 8
+#| fig-align: center
+#| out-width: "90%"
+results |> 
+  pivot_longer(cols = contains("sample"), names_prefix = "mse_") |> 
+  group_by(k, n, name) |> 
+  summarize(value = mean(value)) |> 
+  mutate(name = ifelse(name == "in_sample", "Mean squared residual\nin sample", "Mean squared residual\nin population"),
+         samp_size = factor(str_c("n = ", n)),
+         samp_size = fct_reorder(samp_size, n)) |> 
+  ggplot(aes(x = k, y = value, col = fct_rev(name))) + 
+  geom_line(lwd = 1) + 
+  coord_cartesian(ylim = c(0,30)) + 
+  facet_wrap(vars(samp_size)) + 
+  labs(x = "Order of polynomial", y = "Value", col = "") + 
+  scale_color_manual(values = c("red", "black"))
+```
+
+## Takeaways
+
+- we can specify a BLP that is a very flexible function of a predictor $X$ with polynomials, binning, splines, - more flexibility $\rightarrow$ better fit (lower mean squared residuals) in the sample
+- for small samples, more flexibility $\rightarrow$ worse fit in the population due to *over-fitting*
+
+
+# Categorical predictors and interactions
+
+
+## Butler & Broockman (2011) {.smaller}
+
+Butler & Broockman conducted an **audit experiment** where they emailed about 6000 US state legislators asking for help with registering to vote.
+
+. . . 
+
+Key variables: 
+
+- `treat_deshawn` (1 if email from "Deshawn Jackson", 0 if email from "Jake Mueller")
+- `reply_atall` (1 if legislator responded, 0 otherwise)
+- `leg_republican` (1 if legislator Republican, 0 otherwise)
+
+. . . 
+
+```{r}
+bb <- read_csv('../data/Butler_Broockman.csv')
+```
+
+:::: {.columns}
+
+::: {.column column-width="50%"}
+
+```{r}
+#| echo: true
+mean(bb$reply_atall[bb$treat_deshawn == 1])
+mean(bb$reply_atall[bb$treat_deshawn == 0])
+```
+
+:::
+
+::: {.column column-width="50%"}
+
+```{r}
+#| echo: true
+bb |> 
+  group_by(treat_deshawn) |> 
+  summarize(mean(reply_atall))
+```
+
+:::
+
+::::
+
+
+## Analyzing B&B with regression
+
+```{r}
+#| echo: true
+lm(reply_atall ~ treat_deshawn, data = bb) 
+```
+
+What is the reply rate to emails 
+
+- from Jake Mueller? 
+- from Deshawn Jackson?
+
+. . . 
+
+With a single binary $X$, the BLP $\alpha + \beta X$ is also the CEF (two expectations). 
+
+
+
+## Analyzing B&B with regression (2) {.smaller}
+
+We can make `R` give us the two sample means in various ways: 
+
+```{r}
+#| echo: true
+lm(reply_atall ~ treat_deshawn, data = bb) |> coef()
+```
+
+. . .
+
+```{r}
+#| echo: true
+bb$treatment <- ifelse(bb$treat_deshawn == 1, "Deshawn", "Jake")
+lm(reply_atall ~ treatment, data = bb) |> coef()
+bb$treatment <- ifelse(bb$treat_deshawn == 1, "2. Deshawn", "1. Jake")
+lm(reply_atall ~ treatment, data = bb) |> coef()
+```
+
+. . . 
+
+```{r}
+#| echo: true
+# no intercept via -1
+lm(reply_atall ~ treatment - 1, data = bb) |> coef()
+```
+
+. . . 
+
+Takeaways:
+
+- if we regress on a character or factor variable, `R` omits one category; each other category gets a coefficient indicating difference from the **omitted category**
+- think about predictions for examples, e.g. "email from Jake" vs "email from Deshawn"
+
+
+
+## Adding a predictor {.smaller}
+
+Recall `leg_republican` indicates whether the email recipient was a Republican.
+
+```{r}
+#| echo: true
+lm(reply_atall ~ treat_deshawn + leg_republican, data = bb) |>  
+  coef()
+```
+
+. . . 
+
+If we write the prediction equation as  $\hat{Y}_i = \hat{\beta}_0 + \hat{\beta}_1 \mathrm{DeShawn}_i + \hat{\beta}_2 \mathrm{LegRep}_i$, then we have
+
+| Email | Recipient | Predicted response rate | 
+|-------|:---------:|:-----------------------:|
+| Jake  |   Dem     |      $\hat{\beta}_0$    |
+| DeShawn  |   Dem     |      $\hat{\beta}_0 + \hat{\beta}_1$   |
+| Jake  |   Rep     |      $\hat{\beta}_0 + \hat{\beta}_2$    |
+| DeShawn  |   Rep     |      $\hat{\beta}_0 + \hat{\beta}_1 + \hat{\beta}_2$    |
+
+. . . 
+
+So what is the predicted DeShawn-vs-Jake difference for Democrats? For Republicans? 
+
+## Comparing predictions to actual means 
+
+```{r}
+#| out-width: "75%"
+#| fig-align: center
+#| fig-width: 7
+#| fig-height: 3.5
+combinations <- expand_grid(treat_deshawn = c(0,1),
+                            leg_republican = c(0,1))
+mod_rigid <- lm(reply_atall ~ treat_deshawn + leg_republican, data = bb)
+mod_flex <- lm(reply_atall ~ treat_deshawn*leg_republican, data = bb) 
+
+combinations %>% 
+  mutate(`Model predictions` = predict(mod_rigid, newdata = .),
+         `Actual means` = predict(mod_flex, newdata = .),
+         Treatment = fct_rev(ifelse(treat_deshawn == 1, "DeShawn", "Jake")),
+         Party = ifelse(leg_republican == 1, "Republican", "Democrat")) %>%
+  pivot_longer(cols = c(`Model predictions`, `Actual means`)) %>% 
+  ggplot(aes(x = Treatment, y = value, col = Party)) + 
+  geom_point() + 
+  geom_line(aes(group = leg_republican)) + 
+  facet_wrap(vars(name)) + 
+  scale_color_manual(values = c("blue", "red")) + 
+  labs(y = "Proportion replying")
+
+
+```
+
+. . . 
+
+To make predictions match actual means (and allow effect of treatment to vary by party of legislator): add an interaction
+
+
+## Motivating interactions {.smaller}
+
+We start with 
+
+$$Y_i = a_0 + a_1 X_i + a_2 D_i$$
+
+. . . 
+
+Let's let $a_2$ depend (linearly) on the value of $X_i$!
+
+$$a_2 = b_0 + b_1 X_i $$
+
+. . . 
+
+Substitute in
+$$Y_i = a_0 + a_1 X_i + (b_0 + b_1 X_i) D_i $$
+and rearrange
+$$Y_i = a_0 + a_1 X_i + b_0 D_i + b_1 X_i D_i$$  
+
+. . . 
+
+(Same result if we make $a_1$ depend on $D_i$.)
+
+<!-- This is an idea I got from Richard McElreath's *Statistical Rethinking* book and YouTube lectures.-->
+
+
+
+## Adding an interaction {.smaller}
+
+```{r}
+#| echo: true
+lm(reply_atall ~ treat_deshawn*leg_republican, data = bb) |> coef()
+```
+
+<!-- What is the reply rate for 
+
+- Democrats receiving a Jake email?
+- Democrats receiving a Deshawn email?
+- Republicans receiving a Jake email?
+- Republicans receiving a Deshawn email? -->
+
+. . . 
+
+If we write the prediction equation as
+$$\hat{Y}_i = \hat{\beta}_0 + \hat{\beta}_1 \mathrm{DeShawn}_i + \hat{\beta}_2 \mathrm{LegRep}_i + \hat{\beta}_3 \mathrm{DeShawn}_i \times \mathrm{LegRep}_i$$, 
+then we have
+
+| Email | Recipient | Predicted response rate | 
+|-------|:---------:|:-----------------------:|
+| Jake  |   Dem     |      $\hat{\beta}_0$    |
+| DeShawn  |   Dem     |      $\hat{\beta}_0 + \hat{\beta}_1$   |
+| Jake  |   Rep     |      $\hat{\beta}_0 + \hat{\beta}_2$    |
+| DeShawn  |   Rep     |      $\hat{\beta}_0 + \hat{\beta}_1 + \hat{\beta}_2 + \hat{\beta}_3$    |
+
+
+## Another way {.smaller}
+
+You can arrange the regression to tell you means more directly: 
+
+```{r}
+#| echo: true
+bb$email_party <- paste(ifelse(bb$treat_deshawn == 1, "Deshawn", "Jake"),
+                        ifelse(bb$leg_republican == 0, "D", "R"),
+                        sep = "_") 
+table(bb$email_party)
+lm(reply_atall ~ email_party, data = bb) |> coef()
+lm(reply_atall ~ email_party - 1, data = bb) |> coef()
+```
+
+
+## Takeways 
+
+- you decide the form of the BLP: do you want an intercept and coefficients for the non-omitted groups? do you want means for each category?
+- if you have only categorical predictors and their interactions (*saturated regression*), OLS gives you sample means for each category (though you may have to combine coefficients to recover those sample means)
+
+
+
+<!--
+## Regression learning objectives
+
+- Theory: understand OLS as a plug-in estimator for the BLP/CEF. Not big heavy assumptions 
+- You decide the BLP you're trying to estimate. Understand some options: saturation, interactions, non-linearities
+- Mechanics: spend some time on the linear algebra
+- Inference: bootstrap, classical, robust, clustered standard errors
+-->
+
+
+
+<!--
+minimize mean squared **residual** (in sample) rather than mean squared **error** (in population), which (with some linear algebra and calculus) yields $\hat{\boldsymbol{\beta}} = \left( \mathbb{X}^T \mathbb{X} \right)^{-1} \mathbb{X}^T \mathbf{Y}$ --> 
+
+<!-- [(but for now assume "magic")]{.gray} --> 
+
+
+
+
+<!-- Look at the stuff from two years ago -- did I drop this last year? why? --> 
+<!-- We get across the plug-in principle idea. we get to specify any linear combination of factors, and we will magically get the coefficients that minimize SSR, which is a plug-in estimator of the BLP (MSE minimizing linear predictor) in pop, etc --> 
+<!-- now, what kind of linear function do we want to specify? special cases:  categories no intercept to get sample mean in categories; categories and interaction to get sample means in categories;  polynomials etc --> 
+
+<!-- decide how to spread this out --> 
+
+<!-- we want them to do some inference --> 
+
+<!-- I want to get the vcov in there./ but still thinking about why important!! --> 
+
+
+
+<!-- quick review of concept. minimizing MSE with a linear function (slope and intercept) -> BLP. cov(x,y)/var(x), plug-in estimator --> 
+
+<!-- what about inference? we can imagine an analytical solution, we can use bootstrap, or use the magic results of lm() --> 
+
+<!-- why is there a covariance? -->
+
+<!-- what is our prediction for Y where X = 1, 2, 3? \beta_0 + \beta_1. what is a confidence interval for that prediction? how would you get that? I want them to see bootstrap and analytical approach. --> 
+
+
+<!-- again minimizing MSE but now multiple predictors, so multiple slopes and one intercept. 
+rgl visualization? 
+
+we do the matrix version on a separate day, people can skip if they have no intention of doing more? 
+
+or we just say there is a good video on this and they should watch if they plan to do more. I think I should say that.
+
+Ben Lambert: 
+Estimator (1): https://www.youtube.com/watch?v=fb1CNQT-3Pg
+Estimator (2): https://www.youtube.com/watch?v=qeezdYISDlU
+Estimator (3): https://www.youtube.com/watch?v=C-uW45FSsNQ
+Variance of estimator given homoskedasticity: https://www.youtube.com/watch?v=11J0M7WBMy8
+
+for now: OLS is magic method for finding the coefficients, and we can use lm() to do it -->
+
+<!-- "linear" regression, but we can specify Y to depend on X1, X2, in various ways.
+- non-linearities 
+- interactions
+
+make figures to show how this looks
+-->
+
+<!-- inference: we can use the bootstrap. we get m rows of coefficients. -> variance-covariance matrix. what does this mean? why is there a covariance between coefficients? 
+
+we can also not do the bootstrap and use the estimates from the regression output. that output includes the vcov matrix. --> 
+
+<!-- problem: interaction between treatment and a binary covariate. interpret regression coefficient. -->
+<!-- derive effect for each group. confidence interval for those effects. --> 
+
+<!-- OK that seems more or less good.--> 
+
+
+# Matrix basics 
+
+## A matrix  {.smaller}
+
+A matrix $\mathbb{B}$ is a rectangular table of numbers, e.g. 
+
+$$ \mathbb{B} = \begin{bmatrix} 1 & 2 \\
+4 & 0 \\
+-1 & 3 \end{bmatrix}$$ 
+
+This is a $3\times 2$ matrix (rows $\times$ columns).
+
+<br>
+
+. . . 
+
+The **transpose** of $\mathbb{B}$, written $\mathbb{B}^T$ or  $\mathbb{B}'$, is 
+
+$$ \mathbb{B}^T = \begin{bmatrix} 1  & 4 & -1\\
+2 & 0 & 3 \end{bmatrix}.$$ 
+
+$k$th row of $\mathbb{B}$ is $k$th column of $\mathbb{B}^T$ (and vice versa).
+
+
+## Matrix multiplication {.smaller}
+
+- A **column vector** of length $K$ is a matrix with one column and $K$ rows.
+- A **row vector** of length $K$ is a matrix with one row and $K$ columns.
+
+. . . 
+
+When we multiply an $n \times K$ matrix $\mathbb{B}$ by a column vector of length $K$, $\mathbf{D}$, we get a column vector of length $K$:
+
+![](assets/matrix_mult.png){fig-align="center"}
+
+
+## Matrix manipulation in `R` {.smaller}
+
+```{r}
+#| echo: true
+# equivalent ways to make B:
+B <- cbind(c(1, 4, -1), c(2, 0, 3))
+(B <- matrix(data = c(1, 4, -1, 2, 0, 3), ncol = 2))
+
+t(B)
+
+# also equivalent:
+D <- c(2, 1)
+(D <- matrix(data = c(2, 1), ncol = 1))
+
+B %*% D
+```
+Can only multiply $\mathbb{B}$ and $\mathbf{D}$ if number of columns in $\mathbb{B}$ equals number of rows in $\mathbf{D}$. 
+
+
+# Matrix representation of OLS 
+
+## Two observations and two coefficients {.smaller}
+
+::::{.columns}
+
+:::{.column column-width="50%"}
+
+Suppose we want to estimate the BLP of $Y$ given $X$: $$Y = \beta_0 + \beta_1 X$$
+
+and we have just two observations:
+
+- $X_1 = 0, Y_1 = 1$
+- $X_2 = 1, Y_2 = 0$
+
+What values of $\hat{\beta}_0$ and $\hat{\beta}_1$ minimize the sum of squared residuals?
+
+:::
+
+:::{.column column-width="50%"}
+
+```{r}
+#| fig-height: 3
+#| fig-width: 3
+#| fig-align: center
+#| out-width: "90%"
+#| 
+tibble(x = c(0, 1),
+       y = c(1, 0)) |> 
+  ggplot(aes(x = x, y = y)) + 
+  geom_point() + 
+  theme_bw() + 
+  expand_limits(x = c(-.5, 1.5),
+                y = c(-.5, 1.5)) #+ 
+  # coord_fixed()
+```
+:::
+::::
+
+## System of eqns & matrix representation {.smaller}
+
+We could write the problem as a **system of equations**: 
+
+\begin{align}
+1 &= \hat{\beta}_0 + 0 \hat{\beta}_1 \\
+0 &= \hat{\beta}_0 + 1 \hat{\beta}_1 
+\end{align}
+
+. . . 
+
+**Solution** (by elimination method): $\hat{\beta}_0 = 1$, $\hat{\beta}_1 = - 1$.
+
+. . . 
+
+<br>
+
+::::{.columns}
+
+:::{.column column-width="50%"}
+
+
+The **matrix representation** of this problem is
+
+\begin{align} 
+\begin{bmatrix}
+1 \\
+0
+\end{bmatrix} &= \begin{bmatrix}
+1 & 0 \\
+1 & 1
+\end{bmatrix}
+\begin{bmatrix}
+\hat{\beta}_0 \\
+\hat{\beta}_1
+\end{bmatrix} \\ 
+\mathbf{Y} &= \mathbb{X} \hat{\boldsymbol{\beta}}
+\end{align}
+
+:::
+
+
+:::{.column column-width="50%"}
+
+How matrix multiplication works: 
+
+![](assets/matrix_mult.png){fig-align="center"}
+:::
+::::
+
+<!--
+## Matrix multiplication {.smaller}
+
+Given $n \times K$ **regressor matrix** $\mathbb{X}$ and $K\times 1$ coefficient matrix $\hat{\boldsymbol{\beta}}$,  $\mathbb{X} \hat{\boldsymbol{\beta}}$ is an $n \times 1$ matrix (column vector) of predicted values $\hat{\mathbf{Y}}$: 
+
+$$ 
+\begin{bmatrix}
+1 & X_{[1]1} &   X_{[2]1} &\cdots& X_{[K]1} \\
+1 & X_{[1]2} &  X_{[2]2}& \cdots &X_{[K]2} \\
+\vdots & \vdots  & \vdots & \ddots & \vdots \\
+1 & X_{[1]n} &  X_{[2]n} &\cdots &X_{[K]n} 
+\end{bmatrix} 
+\begin{bmatrix}
+\hat{\beta}_0 \\
+\hat{\beta}_1 \\ 
+\vdots \\
+\hat{\beta}_K
+\end{bmatrix} = 
+\begin{bmatrix}
+\hat{Y}_1 \\
+\hat{Y}_2 \\ 
+\vdots \\
+\hat{Y}_n
+\end{bmatrix}
+$$ 
+
+--> 
+
+
+## Matrix algebra {.smaller}
+
+In matrix form, our system of equations is
+
+$$\mathbf{Y} = \mathbb{X} \hat{\boldsymbol{\beta}} $$ 
+where 
+
+- $\mathbf{Y}$ is an $2 \times 1$ **column vector** (data)
+- $\mathbb{X}$ is an $2 \times 2$ **square matrix**  (data)
+- $\hat{\boldsymbol{\beta}}$ is an $2 \times 1$ **column vector** (unknown coefficients)
+
+<!--In this special case, the number of coefficients is equal to the number of data points ($n$) --> 
+
+. . . 
+
+Matrix algebra way to solve for $\hat{\boldsymbol{\beta}}$: multiply both sides by the **inverse** of $\mathbb{X}$, $\mathbb{X}^{-1}$: 
+
+\begin{align}
+\mathbf{Y} &= \mathbb{X} \hat{\boldsymbol{\beta}} \\
+\mathbb{X}^{-1}  \mathbf{Y} &= \mathbb{X}^{-1} \mathbb{X}  \hat{\boldsymbol{\beta}} \\ 
+\mathbb{X}^{-1}  \mathbf{Y} &= \hat{\boldsymbol{\beta}}
+\end{align}
+
+## Inverting/solving: use `R` {.smaller}
+
+\begin{align} 
+\begin{bmatrix}
+1 \\
+0
+\end{bmatrix} &= \begin{bmatrix}
+1 & 0 \\
+1 & 1
+\end{bmatrix}
+\begin{bmatrix}
+\hat{\beta}_0 \\
+\hat{\beta}_1
+\end{bmatrix} \\ 
+\mathbf{Y} &= \mathbb{X} \hat{\boldsymbol{\beta}} \\
+\mathbb{X}^{-1} \mathbf{Y} &= \hat{\boldsymbol{\beta}}
+\end{align}
+
+. . . 
+
+```{r}
+#| echo: true 
+(X <- matrix(c(1,1,0,1), nrow = 2))
+solve(X)
+```
+
+. . . 
+
+```{r}
+#| echo: true
+Y <- c(1, 0)
+solve(X)%*%Y  # note matrix multiplication: %*%
+```
+
+## A (slightly) more realistic case {.smaller}
+
+
+
+::::{.columns}
+
+:::{.column column-width="50%"}
+
+So far, just two data points, so a line can be drawn through both $\rightarrow$ residuals are all zero. 
+
+What if we have **three** observations?
+
+- $X = 0, Y = 1$
+- $X = 1, Y = 0$
+- $X = 1, Y = 1$
+
+What values of $\hat{\beta}_0$ and $\hat{\beta}_1$ minimize the sum of squared residuals?
+
+:::
+
+:::{.column column-width="50%"}
+
+```{r}
+#| fig-height: 3
+#| fig-width: 3
+#| fig-align: center
+#| out-width: "90%"
+#| 
+tibble(x = c(0, 1, 1),
+       y = c(1, 0, 1)) |> 
+  ggplot(aes(x = x, y = y)) + 
+  geom_point() + 
+  theme_bw() + 
+  expand_limits(x = c(-.5, 1.5),
+                y = c(-.5, 1.5)) #+ 
+  # coord_fixed()
+```
+:::
+::::
+
+
+## Invert $\mathbb{X}$ again? {.smaller}
+
+Now we have 
+
+$$\mathbf{Y} = \mathbb{X} \hat{\boldsymbol{\beta}} $$ 
+where 
+
+- $\mathbf{Y}$ is an $3 \times 1$ **column vector** (data)
+- $\mathbf{X}$ is an $3 \times 2$ **rectangular matrix**  (data)
+- $\hat{\beta}$ is a $2 \times 1$ **column vector** (unknown coefficients)
+
+. . . 
+
+Only square matrices are invertible; we can't solve this system of equations.
+
+. . . 
+
+But remember that we are trying to find $\hat{\boldsymbol{\beta}}$ that minimizes the **sum of squared residuals**; usually can't eliminate all residuals. 
+
+
+## Minimizing sum of squared residuals {.smaller}
+
+In matrix form, the sum of squared residuals is
+
+$$ (\mathbf{Y} - \mathbb{X} \hat{\boldsymbol{\beta}})^T(\mathbf{Y} - \mathbb{X} \hat{\boldsymbol{\beta}}), $$
+i.e. 
+
+$$ 
+\begin{bmatrix}
+Y_1 - \mathbf{X}_1 \hat{\boldsymbol{\beta}} &  Y_2 - \mathbf{X}_2 \hat{\boldsymbol{\beta}} & \cdots & Y_n - \mathbf{X}_n \hat{\boldsymbol{\beta}} \end{bmatrix}  \begin{bmatrix}
+Y_1 - \mathbf{X}_1 \hat{\boldsymbol{\beta}} \\
+Y_2 - \mathbf{X}_2 \hat{\boldsymbol{\beta}} \\
+\vdots \\ Y_n - \mathbf{X}_n \hat{\boldsymbol{\beta}}
+\end{bmatrix}
+$$
+
+. . . 
+
+If we differentiate this with respect to $\hat{\boldsymbol{\beta}}$ and set equal to zero, we get 
+
+\begin{align} \mathbb{X}^T \mathbb{X} \hat{\boldsymbol{\beta}} &= \mathbb{X}^T \mathbf{Y} \\
+ \hat{\boldsymbol{\beta}} &= \left( \mathbb{X}^T \mathbb{X} \right)^{-1} \mathbb{X}^T \mathbf{Y} \end{align}
+ 
+## Illustration with CCES data {.smaller}
+
+```{r}
+#| echo: true
+dat <- read.csv("./../data/cces_2012_subset.csv")
+use <- !is.na(dat$env) & !is.na(dat$gender) & !is.na(dat$aa)
+X <- cbind(1, dat$gender[use], dat$aa[use])
+head(X, 3)
+Y <- dat$env[use]
+head(Y, 3)
+solve(t(X) %*% X) %*% t(X) %*% Y
+```
+. . .
+
+```{r}
+#| echo: true
+lm(env ~ gender + aa, data = dat)
+```
+
+## More resources 
+
+For walk-through of the optimization part of matrix OLS, see Ben Lambert's econometrics videos: 
+
+- [OLS Estimator (1)](https://www.youtube.com/watch?v=fb1CNQT-3Pg)
+- [OLS Estimator (2)]([https://www.youtube.com/watch?v=qeezdYISDlU)
+- [OLS Estimator (3)](https://www.youtube.com/watch?v=C-uW45FSsNQ)
+
+Also see [video on variance of OLS estimator given homoskedasticity](https://www.youtube.com/watch?v=11J0M7WBMy8)
+
