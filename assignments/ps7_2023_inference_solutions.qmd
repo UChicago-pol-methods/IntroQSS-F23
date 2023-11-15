@@ -40,7 +40,7 @@ Your (plug-in) estimator of this effect is $\overline{Y}_1 - \overline{Y}_0$, wh
 First we load the dataset:
 
 ```{r}
-datt <- read.csv("./../../data/oregon_subset.csv")
+datt <- read.csv("./../data/oregon_subset.csv")
 ```
 
 The estimate is:
@@ -58,14 +58,14 @@ The probability of needing to borrow to cover medical expenses was .038 lower am
 
 Letting $n_1$ be the number of lottery winners and $n_0$ be the number of lottery losers,  
 \begin{align}
-\V[\overline{Y}_1 - \overline{Y}_0] &= \V[\overline{Y}_1] + \V[\overline{Y}_0] + 2\text{Cov}[\overline{Y}_1, \overline{Y}_0]  \tag{Step 1}\\ 
+\V[\overline{Y}_1 - \overline{Y}_0] &= \V[\overline{Y}_1] + \V[\overline{Y}_0] - 2\text{Cov}[\overline{Y}_1, \overline{Y}_0]  \tag{Step 1}\\ 
 &=  \V[\overline{Y}_1] + \V[\overline{Y}_0]  \tag{Step 2} \\
 &=  \frac{\V[Y_1]}{n_1} + \frac{\V[Y_0]}{n_0} \tag{Step 3}
 \end{align}
 
 **Answer**
 
-- Step 1 uses the "Variance Rule" (Theorem 2.2.3 in A&M)
+- Step 1 uses the "Variance Rule" (Theorem 2.2.3 in A&M) [Note there was a mistake on the problem set -- it should be a minus sign instead of a plus sign before the covariance term]
 - In Step 2 we eliminate the covariance term because the sample mean among lottery winners is independent of the sample mean among lottery losers across samples
 - In Step 3 we apply the variance of the sample mean (Theorem 3.2.4)
 
@@ -208,7 +208,7 @@ The dataset `kelce.csv` (available on the course github under `data`) contains t
 First we load  the data:
 
 ```{r}
-dat <- read.csv("./../../data/kelce.csv")
+dat <- read.csv("./../data/kelce.csv")
 ```
 
 Here is the difference in Kelce's yards with and without Taylor Swift in attendance: 

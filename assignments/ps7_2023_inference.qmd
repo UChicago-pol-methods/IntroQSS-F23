@@ -45,7 +45,7 @@ Your (plug-in) estimator of this effect is $\overline{Y}_1 - \overline{Y}_0$, wh
 
 Letting $n_1$ be the number of lottery winners and $n_0$ be the number of lottery losers,  
 \begin{align}
-\V[\overline{Y}_1 - \overline{Y}_0] &= \V[\overline{Y}_1] + \V[\overline{Y}_0] + 2\text{Cov}[\overline{Y}_1, \overline{Y}_0]  \tag{Step 1}\\ 
+\V[\overline{Y}_1 - \overline{Y}_0] &= \V[\overline{Y}_1] + \V[\overline{Y}_0] - 2\text{Cov}[\overline{Y}_1, \overline{Y}_0]  \tag{Step 1}\\ 
 &=  \V[\overline{Y}_1] + \V[\overline{Y}_0]  \tag{Step 2} \\
 &=  \frac{\V[Y_1]}{n_1} + \frac{\V[Y_0]}{n_0} \tag{Step 3}
 \end{align}
