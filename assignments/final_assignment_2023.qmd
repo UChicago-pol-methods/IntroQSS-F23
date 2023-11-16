@@ -5,22 +5,25 @@ subtitle: "Due December 5, 2023, at 9pm"
 format: pdf
 ---
 
-*\textsc{Note1}: Start with the file `final_assignment_2023.qmd` (available from the github repository at https://github.com/UChicago-pol-methods/IntroQSS-F23/tree/main/assignments). Modify that file to include your answers. Make sure you can "render" the file (e.g. in RStudio by clicking on the `Render` button). Submit both the qmd file and the PDF via Canvas.*
+*\textsc{Note}: Start with the file `final_assignment_2023.qmd` (available from the github repository at https://github.com/UChicago-pol-methods/IntroQSS-F23/tree/main/assignments). Modify that file to include your answers. Make sure you can "render" the file (e.g. in RStudio by clicking on the `Render` button). Submit both the qmd file and the PDF via Canvas.*
+
+**Further note**: *Collaboration is not permitted on this assignment.* You may ask clarifying questions on the course stackoverflow (please do not share code). You may not share code or discuss answers with anyone else otherwise.
 
 
-For the final assignment, you will analyze a dataset of your own choice. Choose a dataset that interests you, but that also 
+\vspace{.5in}
+
+For this assignment, you will analyze a dataset of your own choice. Choose a dataset that interests you, but that also 
 
 - has a respectable number of observations (rows), e.g. at least 40
-- has an adequate number and variety of variables (columns) -- at the very minimum, 3
-- allows you to carry out all the tasks in the list below
+- allows you to carry out all the tasks in the list below, which means you need at least 3 variables
 
 Ideas for finding datasets:
 
-- Many journals require authors to file replication data, often at the Harvard Dataverse, e.g.
+- Many journals require authors to share replication data, often at the Harvard Dataverse (links below), so that if you find a paper that interests you that was published in one of those journals in recent years, you should be able to access the data
     - [Quarterly Journal of Economics](https://dataverse.harvard.edu/dataverse/qje)
     - [American Journal of Political Science](https://dataverse.harvard.edu/dataverse/ajps)
     - [American Political Science Review](https://dataverse.harvard.edu/dataverse/the_review)
-- Specific datasets you might find interesting
+- Other datasets you might find interesting
     - [Penn World Tables](https://www.rug.nl/ggdc/productivity/pwt/)
     - [Varieties of Democracy](https://v-dem.net/) -- see also `R` package
     - [Comparative study of electoral systems (CSES)](https://cses.org/)
