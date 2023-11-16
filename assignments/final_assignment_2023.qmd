@@ -1,0 +1,118 @@
+---
+title: "Final assignment"
+author: "(Your name here)"
+subtitle: "Due December 5, 2023, at 9pm"
+format: pdf
+---
+
+*\textsc{Note1}: Start with the file `final_assignment_2023.qmd` (available from the github repository at https://github.com/UChicago-pol-methods/IntroQSS-F23/tree/main/assignments). Modify that file to include your answers. Make sure you can "render" the file (e.g. in RStudio by clicking on the `Render` button). Submit both the qmd file and the PDF via Canvas.*
+
+
+For the final assignment, you will analyze a dataset of your own choice. Choose a dataset that interests you, but that also 
+
+- has a respectable number of observations (rows), e.g. at least 40
+- has an adequate number and variety of variables (columns) -- at the very minimum, 3
+- allows you to carry out all the tasks in the list below
+
+Ideas for finding datasets:
+
+- Many journals require authors to file replication data, often at the Harvard Dataverse, e.g.
+    - [Quarterly Journal of Economics](https://dataverse.harvard.edu/dataverse/qje)
+    - [American Journal of Political Science](https://dataverse.harvard.edu/dataverse/ajps)
+    - [American Political Science Review](https://dataverse.harvard.edu/dataverse/the_review)
+- Specific datasets you might find interesting
+    - [Penn World Tables](https://www.rug.nl/ggdc/productivity/pwt/)
+    - [Varieties of Democracy](https://v-dem.net/) -- see also `R` package
+    - [Comparative study of electoral systems (CSES)](https://cses.org/)
+    - [Cooperative election study (formerly CCES)](https://cces.gov.harvard.edu/)
+    - [American National Election Study (ANES)](https://electionstudies.org/)
+    - [British Household Panel Survey](https://www.iser.essex.ac.uk/bhps)
+    - [British Election Study (BES)](https://www.britishelectionstudy.com/)
+    - [Roper iPoll](https://guides.lib.uchicago.edu/polls) US public opinion data
+    - [World Bank open data sets](https://data.worldbank.org)
+- The University of Chicago Library has lists of resources for  [political science](https://guides.lib.uchicago.edu/c.php?g=298128&p=1988812), [economics](https://guides.lib.uchicago.edu/busecon), and other subject areas (some more useful than others)
+
+You may find a dataset that is not available in formats we have used so far (`.RData`, `.RDS`, `.csv`). (Check what formats are available: e.g. on Harvard Dataverse there is often an `.RData` version or a `.csv` version, though you may need to click on "Access data" to see it.) There are many tools for reading data formatted for other statistical software into `R`. The `haven` package reads SPSS, Stata, and SAS files into `R`; the `readxl` package reads Excel spreadsheets into `R`; the `read.table()` command is helpful for reading in different kinds of text files (`.txt`, `.tab`). If you google "read X file in R" where X is e.g. SPSS or SAS or Stata you'll find some help. 
+    
+Your task is to use your chosen dataset to display your understanding of concepts from the class and your ability to execute skills we have worked on. 
+
+
+\vspace{.5in}
+
+
+### 1. Data description
+
+*What do the rows of the dataset represent (people, municipalities, a country-year, etc)? What are some of the important variables you will be using, and (if not obvious) how were they measured? Is this a sample from a population (if so what is that population?), or is this the whole population? (If your dataset is not a sample from a population, you will assume that is is for the purpose of inference below, as is standard in social science research.)*
+
+(Your answer here.)
+
+
+\vspace{.5in}
+
+### 2. Potential research questions
+
+*What research questions might this data be useful for answering?*
+
+(Your answer here.)
+
+
+\vspace{.5in}
+
+### 3. Dataset loading, variable creation and other data manipulation
+
+*The tasks below will probably require you to create new variables and exclude missing observations; you may also want to rename some variables for your convenience. Put your data loading and data manipulation code here so we can see the skills you have accumulated in this area.*  
+
+```{r}
+# your code here
+```
+
+\vspace{.5in}
+
+### 4. Inference for a mean
+
+*Estimate the mean of 3 important variables in the dataset. For each one, report a 95\% confidence interval in a table. For one of the variables, state a null hypothesis that could be considered interesting to test and report a $p$-value for that null hypothesis. Explain in words what your $p$-value means. In all cases explain what assumptions you are making.*
+
+(Your code and data here -- you get the idea.)
+
+\vspace{.5in}
+
+### 5. Difference between means
+
+*Define two means that could be interesting to compare. (It could be two variables in the dataset, or a single variable for two groups of observations defined by another variable, e.g. average growth rate of democracies and non-democracies). Estimate the difference in the two means, report a confidence interval for that difference, and report a $p$-value. (Do not use regression for this question.) Explain in words what your $p$-value means. Explain what assumptions you are making.*
+
+\vspace{.5in}
+
+
+### 6. Scatterplot 
+
+*Choose a dependent variable ($Y$) and an independent variable ($X$). Present a scatterplot with $Y$ on the vertical axis and $X$ on the horizontal axis. Both $X$ or $Y$ should be numerical variables, not categorical variables such as religion or race. It is helpful if either $X$ or $Y$ is a continuous variable (i.e. one that takes on many values) rather than a discrete variable; if not, you may want to use `jitter()` to avoid plotting many points on top of each other. Comment on any apparent relationship between $X$ and $Y$ and why it might arise.*
+
+\vspace{.5in}
+
+### 7. Regression with one predictor
+
+*Regress $Y$ on $X$ to estimate the BLP of $Y$ as a function of $X$. Interpret the slope coefficient. In a table, report a 95% confidence interval and $p$-value for the slope coefficient based on three approaches:*
+
+- *classical standard errors as computed by `lm()`*
+- *robust (Huber-White) standard errors as computed by `estimatr::lm_robust()`*
+- *bootstrap standard errors (naive bootstrap)*
+*State any assumptions you are making.*
+
+\vspace{.5in}
+
+### 8. Confidence interval for a prediction
+
+*Based on the model above, what is your prediction for $Y$ at the highest value of $X$ in your dataset? Report a 95\% confidence interval for that prediction, stating and justifying any assumptions. (Hint: you'll need the variance rule and/or the bootstrap.)*
+
+\vspace{.5in}
+
+### 9. Regression with more than one predictor
+
+*Again regress $Y$ on $X$, but now include additional predictors other than $X$. Explain why you might want to include these additional predictors in the model. Fit at least two models with different sets of predictors or transformations of predictors. Report the results in a single regression table (using `modelsummary::modelsummary()` or a similar approach). Compare the coefficient on $X$ across models.*
+
+\vspace{.5in}
+
+### 10. Interactions
+
+*Again regress $Y$ on $X$, but this time include an interaction between $X$ and a numerical predictor $W$. Tell us what $W$ is and explain why the relationship between $X$ and $Y$ could plausibly depend on $W$. Report a confidence interval and $p$-value for the interaction term, stating any assumptions you use. Explain in words what the estimated interaction term means.*
+
