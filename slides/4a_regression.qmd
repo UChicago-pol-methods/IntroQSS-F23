@@ -19,6 +19,7 @@ format:
 
 library(tidyverse)
 knitr::opts_chunk$set(dev = "ragg_png")
+options(width=500)
 ```
 
 ## Regression motivation {.smaller}
@@ -27,7 +28,7 @@ It's great if your estimator is as simple as a sample mean $\overline{X}$ or a d
 
 . . . 
 
-But $>95%$ of the time researchers in social science use **OLS regression**:
+But $>95\%$ of the time researchers in social science use **OLS regression**:
 
 - predict $Y$ using many predictors $X_{[1]}, X_{[2]}, \ldots$
 - relationship between $Y$ and $X_{[1]}$ *controlling for* or *adjusting for* other variables
@@ -164,9 +165,7 @@ modelsummary::modelsummary(list(my_reg_0, my_reg_1, my_reg),
 ```
 
 
-## Accessing and interpreting regression results (2) {.smaller}
-
-Some useful functions: 
+## Accessing regression results {.smaller}
 
 ```{r}
 #| echo: true
@@ -177,6 +176,7 @@ nobs(my_reg)
 . . . 
 
 ```{r}
+#| echo: true 
 names(my_reg)
 my_reg$coefficients
 head(my_reg$residuals)
@@ -185,6 +185,7 @@ head(my_reg$residuals)
 . . . 
 
 ```{r}
+#| echo: true 
 names(summary(my_reg))
 summary(my_reg)$coefficients
 ```
@@ -614,35 +615,39 @@ we can also not do the bootstrap and use the estimates from the regression outpu
 
 ## Inference for a single coefficient
 
-Inference for a single coefficient $\hat{\beta_1}$ is just like inference for a sample mean:
+Inference procedures for a single coefficient $\hat{\beta_1}$ is just like inference for a sample mean:
 
 - (estimated) standard error $\hat{\sigma}[\hat{\beta_1}]$ comes from regression output
-- use $\hat{\sigma}[\hat{\beta_1}]$ to produce confidence interval
-- use $\hat{\sigma}[\hat{\beta_1}]$ to get $p$-value [(probability of coefficient further from null if population coefficient were zero)]{.gray}
+- use $\hat{\sigma}[\hat{\beta_1}]$ to produce confidence interval, get p$-value [(probability of coefficient further from null if population coefficient were zero)]{.gray} assuming sampling distribution approximately normal
 
 ## Which standard errors? 
 
-- *classical* standard errors (default for `lm()`) assume iid errors ($\text{Cov}[e_i, e_j] = 0 \, \forall \, i, j$) and *homoskedasticity* ($\V[e_i \mid X] = \V[e_i]$) 
-- *robust* standard errors (default for `estimatr::lm_robust()`) assume iid errors but allow *heteroskedasticity*
+- *classical* standard errors (default for `lm()`) assume regression errors
+    - are **independent**: $\text{Cov}[e_i, e_j] = 0 \, \forall \, i, j$, 
+    - have **equal variance**: $\V[e_i \mid X_i] = \V[e_i]$  (*homoskedasticity*) 
+- *robust* standard errors (default for `estimatr::lm_robust()`) assume regression errors are independent, but may have different variances (*heteroskedasticity*)
 - *clustered* standard errors (`clusters` option for `estimatr::lm_robust()`) assume errors may be correlated within defined clusters
+- *bootstrap* standard errors: naive version makes same assumption as *robust*; can incorporate clustered sampling
+
+<!-- figure here to show why heteroskedasticity matters? or on the board -->
 
 ## Inference for combinations of coefficients {.smaller}
 
-Often we are interested in linear combinations of coefficients.
+Often we are interested in linear combinations of coefficients, e.g. 
 
-e.g. in interactive model above,
-
-- estimated reply rate for Democrats receiving Deshawn email is $\hat{\beta}_0 + \hat{\beta}_1$
-- estimated effect of Deshawn email for Republicans is $\hat{\beta}_1 + \hat{\beta}_3$
-
-. . . 
-
-If we want a CI or $p$-value, we need the standard error of a sum of coefficients. 
+- because a quantity of interest is estimated by the sum of coefficients: e.g. in interactive model above,
+    - estimated reply rate for Democrats receiving Deshawn email is $\hat{\beta}_0 + \hat{\beta}_1$
+    - estimated effect of Deshawn email for Republicans is $\hat{\beta}_1 + \hat{\beta}_3$
+- because we want to predict the outcome at specific values of the predictors: e.g. $\hat{Y}_i = \hat{\beta}_0 + 2\hat{\beta}_1 + 3\hat{\beta}_1$
 
 . . . 
 
+If we want a CI or $p$-value, we need the standard error of a (weighted) sum of coefficients. 
 
-Recall variance rule: $\V[X + Y] = \V[X] + \V[Y] + 2 \text{Cov}[X, Y]$.
+. . . 
+
+
+Recall **variance rule**: in general form,  $$\V[aX + bY + c] = a^2\V[X] + b^2\V[Y] + 2 a b \text{Cov}[X, Y]$$
 
 
 Is e.g. $\text{Cov}[\hat{\beta}_0, \hat{\beta}_1] = 0$ in $Y_i = \hat{\beta}_0 + \hat{\beta}_1 \text{Deshawn}_i$?
