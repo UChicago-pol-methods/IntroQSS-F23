@@ -19,7 +19,8 @@ format:
 
 library(tidyverse)
 knitr::opts_chunk$set(dev = "ragg_png")
-options(width=500)
+options(width=300)
+set.seed(123456)
 ```
 
 ## Regression motivation {.smaller}
@@ -796,7 +797,7 @@ pres2 <- pres |>
 ```{r}
 #| echo: true
 # regression
-lm(incvote ~ juneapp + juneapp_squared + juneapp_cubed, data = pres2)
+lm(incvote ~ juneapp + juneapp_squared + juneapp_cubed, data = pres2) 
 ```
 
 
@@ -814,7 +815,7 @@ lm(incvote ~ juneapp + I(juneapp^2) + I(juneapp^3), data = pres)
 ```{r}
 #| echo: true
 # poly() function
-lm(incvote ~ poly(juneapp, degree = 3, raw = T), data = pres)
+lm(incvote ~ poly(juneapp, degree = 3, raw = T), data = pres) |> summary()
 ```
 
 
@@ -913,6 +914,11 @@ $$Y_i = \beta_0 + \beta_1 X_i + \beta_2 X_i^2 + \ldots + \beta_k X_i^k $$
 
 As we increase $k$, what will happen to  mean squared residual in **sample** [(i.e. $\frac{1}{n} \sum (Y_i - \hat{Y}_i)^2$)]{.gray} vs in **population** [(i.e. $\frac{1}{N} \sum (Y_i - \hat{Y}_i)^2$)]{.gray}?
 
+How does this depend on sample size $n$?
+
+## Overfitting (3)
+
+
 ```{r functions, echo = F}
 draw_dat <- function(n = 15){
   dat_xy |> slice_sample(n = n)
@@ -947,9 +953,9 @@ base_plot <- plot_dat |>
 :::: {.columns}
 
 ::: {.column column-width="50%"}
-```{r, echo = F, fig.height = 5}
+```{r degree-1, echo = F, fig.height = 5}
 #| fig-width: 4.5
-#| fig-height: 3
+#| fig-height: 2.75
 #| fig-align: center
 #| out-width: "90%" 
 base_plot +
@@ -960,9 +966,9 @@ base_plot +
 :::
 
 ::: {.column column-width="50%"}
-```{r}
+```{r degree-3}
 #| fig-width: 4.5
-#| fig-height: 3
+#| fig-height: 2.75
 #| fig-align: center
 #| out-width: "90%" 
 base_plot +
@@ -973,8 +979,17 @@ base_plot +
 ::::
 
 
+```{r degree-8}
+#| fig-width: 4.5
+#| fig-height: 2.75
+#| fig-align: center
+#| out-width: "45%" 
+base_plot +
+  geom_smooth(method = "lm", se = F, formula = y ~ poly(x, 8)) +
+  labs(title = "Cubic fit in sample (polynomial order = 8)")
+```
 
-## Overfitting (3)
+## Overfitting (4)
 
 
 ```{r, echo = F, cache = T}
@@ -989,7 +1004,7 @@ results <- expand_grid(k = c(1, 2, 3, 4, 5),
          mse_out_of_sample = map_dbl(mod, get_mse, dat = dat_xy)) 
 ```
 
-```{r, echo = F}
+```{r last-plot, echo = F}
 #| fig-height: 5
 #| fig-width: 8
 #| fig-align: center

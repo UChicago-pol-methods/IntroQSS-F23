@@ -519,4 +519,5 @@ For walk-through of the optimization part of matrix OLS, see Ben Lambert's econo
 
 Also see [video on variance of OLS estimator given homoskedasticity](https://www.youtube.com/watch?v=11J0M7WBMy8)
 
+<!-- could do something on inference -- consider next year. -->
 
